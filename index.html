@@ -1,397 +1,302 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-<meta charset="UTF-8" />
-<title>Tunnel Galerie Navigation (Monochrom)</title>
-<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Smooth Overlay Pause Endless</title>
 <style>
-  :root {
-    --overlay-w: 60vw;
-    --overlay-h: 70vh;
-  }
-  body { margin: 0; overflow: hidden; background: #000; font-family: system-ui, sans-serif; }
-  canvas { display: block; filter: grayscale(100%); } /* Tunnel bleibt monochrom */
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  overflow: hidden;
+  font-family: Arial, sans-serif;
+}
 
-  /* Overlay für Webseiten */
-  #overlay {
-    position: fixed;
-    top: 10vh;
-    left: calc(50vw - var(--overlay-w) / 2);
-    width: var(--overlay-w);
-    height: var(--overlay-h);
-    background: rgba(20,20,20,0.96);
-    border-radius: 16px;
-    overflow: hidden;
-    display: none;
-    opacity: 0;
-    transition: opacity 0.35s ease;
-    box-shadow: 0 0 40px rgba(255,255,255,0.35);
-    z-index: 10;
-    backdrop-filter: blur(2px);
-  }
-  #overlay.visible { display: block; opacity: 1; }
-  #overlay iframe { width: 100%; height: 100%; border: 0; }
+#tunnel-background {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  border: none;
+  z-index: 0;
+}
 
-  /* UI-Buttons */
-  .ui-btn {
-    position: fixed;
-    top: 12px;
-    width: 48px; height: 48px;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 26px; line-height: 1;
-    color: #fff; cursor: pointer; user-select: none;
-    background: rgba(0,0,0,0.6);
-    border-radius: 50%;
-    box-shadow: 0 0 10px rgba(255,255,255,0.35);
-    z-index: 20;
-  }
-  #closeBtn { right: 16px; display: none; }
-  #toggleNavBtn { left: 16px; }
+#overlay-system {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 10;
+  touch-action: none;
+  transition: transform 0.6s cubic-bezier(0.25, 0.1, 0.25, 1);
+  transform: translateX(0);
+}
 
-  /* Mobil */
-  @media (max-width: 900px) {
-    :root { --overlay-w: 90vw; --overlay-h: 82vh; }
-    #overlay { top: 9vh; left: calc(50vw - var(--overlay-w) / 2); border-radius: 12px; }
-  }
+#overlay-system.paused {
+  transform: translateX(60%);
+}
+
+.page {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transform-origin: center center;
+  transition: transform 0.6s ease, opacity 0.6s ease;
+  opacity: 0;
+  transform: scale(0);
+  z-index: 1;
+}
+
+.title {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  color: #ccc;
+  font-size: 2rem;
+  text-shadow: 1px 1px 5px black;
+  z-index: 10;
+  transition: opacity 0.6s ease;
+}
+
+.iframe-container {
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+  transition: transform 0.6s ease, opacity 0.6s ease;
+  transform-origin: center center;
+  transform: scale(0.6);
+}
+
+.iframe-container.active {
+  transform: scale(1.2);
+  z-index: 999;
+}
+
+.iframe-container iframe {
+  width: 100%;
+  height: 100%;
+  border: none;
+  pointer-events: none;
+  filter: blur(5px);
+  transition: filter 0.6s ease;
+}
+
+.iframe-container.active iframe {
+  pointer-events: auto;
+  filter: blur(0);
+}
+
+.click-overlay {
+  position: absolute;
+  inset: 0;
+  cursor: grab;
+  z-index: 20;
+  transition: opacity 0.6s ease;
+}
+
+.click-overlay.hidden-overlay {
+  opacity: 0;
+  pointer-events: none;
+}
 </style>
 </head>
 <body>
-<div id="overlay" aria-hidden="true"><iframe sandbox="allow-scripts allow-same-origin allow-popups"></iframe></div>
-<div id="closeBtn" class="ui-btn" title="Overlay schließen">✕</div>
-<div id="toggleNavBtn" class="ui-btn" title="Navigation ein/aus">◎</div>
 
-<script type="module">
-import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.153.0/build/three.module.js';
-import { ImprovedNoise } from 'https://cdn.jsdelivr.net/npm/three@0.153.0/examples/jsm/math/ImprovedNoise.js';
+<iframe id="tunnel-background" src="https://paulkimmerl.github.io/tunnel/"></iframe>
 
-/* === Szene / Kamera / Renderer === */
-const scene = new THREE.Scene();
-scene.fog = new THREE.FogExp2(0x000000, 0.025);
+<div id="overlay-system"></div>
 
-const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 2500);
-camera.position.set(0, 0, 5);
-camera.lookAt(0, 0, 0);
+<script>
+const overlaySystem = document.getElementById("overlay-system");
 
-const renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: 'high-performance' });
-renderer.setSize(window.innerWidth, window.innerHeight);
-renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-renderer.setClearColor(0x000000);
-renderer.outputColorSpace = THREE.SRGBColorSpace; // ← gültig; entfernt JSFiddle-Warnung
-document.body.appendChild(renderer.domElement);
-
-const noise = new ImprovedNoise();
-
-/* === Tunnel-Parameter (dein Original) === */
-const radialCount = 64;
-const segmentLength = 200;
-const spacingZ = 0.15;
-const radius = 3;
-const sectionsCount = 3;
-const loopLength = segmentLength * sectionsCount;
-const totalInstances = radialCount * segmentLength * sectionsCount;
-
-/* === Tunnel-Geometrie (Instanced) === */
-const boxGeo = new THREE.BoxGeometry(0.1, 0.3, 0.05);
-const boxMat = new THREE.MeshStandardMaterial({
-  color: 0x888888,
-  roughness: 0.4,
-  metalness: 1.0,
-  envMapIntensity: 1.0
-});
-const mesh = new THREE.InstancedMesh(boxGeo, boxMat, totalInstances);
-mesh.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
-scene.add(mesh);
-
-const dummy = new THREE.Object3D();
-
-let phase = 0;
-let targetPhase = 0;
-
-/* === Scroll + Touch === */
-window.addEventListener('wheel', (e) => {
-  targetPhase += e.deltaY * 0.3;
-  if (targetPhase < 0) targetPhase = 0;
-}, { passive: true });
-
-let touchStartY = null;
-window.addEventListener('touchstart', (e) => {
-  if (e.touches.length === 1) touchStartY = e.touches[0].clientY;
-}, { passive: true });
-window.addEventListener('touchmove', (e) => {
-  if (e.touches.length === 1 && touchStartY !== null) {
-    const delta = touchStartY - e.touches[0].clientY;
-    targetPhase += delta * 0.5;
-    if (targetPhase < 0) targetPhase = 0;
-    touchStartY = e.touches[0].clientY;
-  }
-}, { passive: true });
-window.addEventListener('touchend', () => { touchStartY = null; });
-
-/* === Dynamische Tunnellichter (dein Original) === */
-class TunnelLight {
-  constructor() {
-    this.light = new THREE.PointLight(0xffffff, 0, 30);
-    scene.add(this.light);
-    this.reset(true);
-    this.waitTime = 0;
-  }
-  reset(init = false) {
-    this.direction = Math.random() < 0.5 ? 1 : -1;
-    this.speed = (Math.random() * 0.5 + 0.8) * this.direction;
-    const maxZ = loopLength * spacingZ * 3;
-    this.posZ = (Math.random() * 1.4 - 0.2) * maxZ;
-    this.angleOffset = Math.random() * Math.PI * 2;
-    if (!init) this.waitTime = THREE.MathUtils.randFloat(1, 4);
-    this.light.intensity = 0;
-    this.light.intensityBase = THREE.MathUtils.randFloat(0.55, 0.95);
-    this.light.distance = THREE.MathUtils.randFloat(20, 40);
-  }
-  update(delta) {
-    if (this.waitTime > 0) {
-      this.waitTime -= delta;
-      this.light.intensity = 0;
-      return;
-    }
-    this.posZ += this.speed * delta * 60;
-    const maxZ = loopLength * spacingZ * 3;
-
-    if (this.posZ > maxZ * 1.2 || this.posZ < -maxZ * 0.2) { this.reset(); return; }
-
-    const fadeStart = -maxZ * 0.2;
-    const fadeEnd = maxZ * 1.2;
-    const fadeRange = 0.3 * maxZ;
-
-    if (this.posZ < fadeStart + fadeRange) {
-      this.light.intensity = THREE.MathUtils.clamp((this.posZ - fadeStart) / fadeRange, 0, 1) * this.light.intensityBase;
-    } else if (this.posZ > fadeEnd - fadeRange) {
-      this.light.intensity = THREE.MathUtils.clamp((fadeEnd - this.posZ) / fadeRange, 0, 1) * this.light.intensityBase;
-    } else {
-      this.light.intensity = this.light.intensityBase;
-    }
-    const angle = this.posZ * 0.1 + this.angleOffset + performance.now() * 0.001;
-    const r = radius - 0.5;
-    this.light.position.set(Math.cos(angle) * r, Math.sin(angle) * r, -this.posZ);
-  }
-}
-const lights = [];
-for (let i = 0; i < 20; i++) lights.push(new TunnelLight());
-
-/* === Navigation-Spheres (ankerpunkte) ===
-   * Sichtbarkeit: MeshBasicMaterial (leuchtet ohne Licht)
-   * Bewegung: z-Position an phase gekoppelt, damit man sie „anfliegt“
-*/
-const links = [
-  { title: "Platzhalter 1", url: "https://example.com" },
-  { title: "Platzhalter 2", url: "https://example.org" },
-  { title: "Platzhalter 3", url: "https://example.net" },
-  { title: "three.js",     url: "https://threejs.org" }
+// ==== Originale Seiten ====
+const originalPagesData = [
+  {title: "Start"},
+  {title: "Seite 1", src: "https://example.com"},
+  {title: "Seite 2", src: "https://example.com"},
+  {title: "Seite 3", src: "https://example.com"},
+  {title: "Seite 4", src: "https://example.com"},
 ];
-// 1–2 Anker je Section → einfach mehr Items pushen
 
-const spheres = [];
-const sphereGeo = new THREE.SphereGeometry(1.2, 32, 32);
-const haloGeo = new THREE.SphereGeometry(1.65, 16, 16); // „Aura“
-const basicWhite = new THREE.MeshBasicMaterial({ color: 0xffffff });
-const haloMat = new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.25, depthWrite: false });
+let pages = [];
+let currentPage = 0;
 
-const SCROLL_SCALE = spacingZ * 1.02; // passend zur Tunnel-Formel
+// ==== Funktion um Page zu erstellen ====
+function createPage(data) {
+  const page = document.createElement("div");
+  page.classList.add("page");
 
-links.forEach((item, i) => {
-  const sphere = new THREE.Mesh(sphereGeo, basicWhite.clone());
-  const halo = new THREE.Mesh(haloGeo, haloMat.clone());
-  sphere.add(halo);
+  if(data.src) {
+    const container = document.createElement("div");
+    container.classList.add("iframe-container");
 
-  const baseZ = -(i * 300 + 200); // Abstand im Tunnel
-  const angle = i * 0.9; // etwas rotieren um den Tunnel
-  const r = radius + 0.5;
+    const iframe = document.createElement("iframe");
+    iframe.src = data.src;
 
-  sphere.position.set(Math.cos(angle) * r, Math.sin(angle) * r, baseZ);
+    const overlay = document.createElement("div");
+    overlay.classList.add("click-overlay");
 
-  // kleines eigenes Licht als Akzent (wird vom Grayscale nicht „weggemacht“)
-  const p = new THREE.PointLight(0xffffff, 1, 25);
-  sphere.add(p);
+    const title = document.createElement("div");
+    title.classList.add("title");
+    title.textContent = data.title;
 
-  scene.add(sphere);
-  spheres.push({
-    mesh: sphere,
-    url: item.url,
-    title: item.title,
-    baseZ,
-    angle,
-    r,
-    hovered: false
-  });
-});
+    container.appendChild(iframe);
+    container.appendChild(overlay);
+    container.appendChild(title);
+    page.appendChild(container);
 
-/* === Noise-Funktionen (dein Original) === */
-function noisePos(x, y, t) {
-  const base = noise.noise(x * 0.3 + t * 0.1, y * 0.3 + t * 0.1, t * 0.01);
-  const mod  = noise.noise(x * 0.8 - t * 0.05, y * 0.8 + t * 0.07, t * 0.015);
-  return base * 1.3 + mod * 0.4;
-}
-function noiseScale(x, y, t) {
-  const base = noise.noise(x * 1.5 + t * 0.25, y * 1.5 - t * 0.2, t * 0.2);
-  const mod  = noise.noise(x * 2.0 - t * 0.1, y * 2.0 + t * 0.12, t * 0.18);
-  return base * 1.3 + mod * 0.4;
-}
+    // Click Overlay
+    overlay.addEventListener("click", e => {
+      e.stopPropagation();
+      if(overlaySystem.classList.contains("paused")) return;
 
-/* === Tunnel-Update (dein Original unverändert inhaltlich) === */
-function updateTunnel(time) {
-  let idx = 0;
-  const waveAmp = THREE.MathUtils.mapLinear(Math.sin(time * 0.07), -1, 1, 0.7, 1.5);
+      document.querySelectorAll(".iframe-container").forEach(c=>{
+        c.classList.remove("active");
+        c.querySelector(".click-overlay").classList.remove("hidden-overlay");
+        c.querySelector("iframe").style.pointerEvents = "none";
+        const t = c.querySelector(".title");
+        if(t) t.style.opacity = 1;
+      });
 
-  for (let s = 0; s < sectionsCount; s++) {
-    for (let i = 0; i < segmentLength; i++) {
-      const tunnelIndex = (s * segmentLength + i + Math.floor(phase)) % loopLength;
+      container.classList.add("active");
+      overlay.classList.add("hidden-overlay");
+      iframe.style.pointerEvents = "auto";
+      title.style.opacity = 0;
+    });
 
-      for (let j = 0; j < radialCount; j++) {
-        const angleBase = (j / radialCount) * Math.PI * 2;
-
-        const wpos = noisePos(tunnelIndex * 0.2, j * 0.15, time) * waveAmp * 1.5;
-        const r = radius + wpos;
-        const x = Math.cos(angleBase) * r;
-        const y = Math.sin(angleBase) * r;
-
-        const yOffset = noisePos(tunnelIndex * 0.1 + 100, j * 0.1 + 200, time) * waveAmp * 1.3;
-
-        const posZ = -((s * segmentLength + i) * spacingZ * 1.02);
-
-        dummy.position.set(x, y + yOffset, posZ);
-        dummy.rotation.z = angleBase + wpos * 2.5;
-
-        const scNoise = noiseScale(tunnelIndex, j, time);
-        const sc = THREE.MathUtils.mapLinear(scNoise, -1, 1, 0.5, 1.5) * waveAmp;
-
-        dummy.scale.set(sc * 0.3, sc * 0.7, sc * 0.3);
-        dummy.updateMatrix();
-        mesh.setMatrixAt(idx++, dummy.matrix);
+    document.addEventListener("click", e => {
+      if(overlaySystem.classList.contains("paused")) return;
+      if(!container.contains(e.target)){
+        container.classList.remove("active");
+        overlay.classList.remove("hidden-overlay");
+        iframe.style.pointerEvents = "none";
+        title.style.opacity = 1;
       }
-    }
+    });
+  } else {
+    const title = document.createElement("div");
+    title.classList.add("title");
+    title.textContent = data.title;
+    page.appendChild(title);
   }
 
-  mesh.instanceMatrix.needsUpdate = true;
-
-  // dynamische Lichter
-  lights.forEach(l => l.update(0.016));
+  overlaySystem.appendChild(page);
+  return page;
 }
 
-/* === Overlay / UI === */
-const overlay = document.getElementById('overlay');
-const iframe  = overlay.querySelector('iframe');
-const closeBtn = document.getElementById('closeBtn');
-const toggleNavBtn = document.getElementById('toggleNavBtn');
-
-function showOverlay(url) {
-  iframe.src = url;
-  overlay.style.display = 'block';
-  requestAnimationFrame(() => overlay.classList.add('visible'));
-  closeBtn.style.display = 'flex';
-  overlay.setAttribute('aria-hidden', 'false');
-}
-
-function hideOverlay() {
-  overlay.classList.remove('visible');
-  setTimeout(() => { overlay.style.display = 'none'; }, 350);
-  closeBtn.style.display = 'none';
-  overlay.setAttribute('aria-hidden', 'true');
-  // optional: iframe.src = ''; // freigeben
-}
-
-closeBtn.addEventListener('click', (e) => {
-  e.stopPropagation();
-  hideOverlay();
+// ==== Alle Originalseiten erstellen ====
+originalPagesData.forEach(d=>{
+  const p = createPage(d);
+  pages.push(p);
 });
 
-let navVisible = true;
-toggleNavBtn.addEventListener('click', () => {
-  navVisible = !navVisible;
-  spheres.forEach(s => s.mesh.visible = navVisible);
-});
-
-/* Overlay selbst klickbar → Seite im neuen Tab öffnen */
-overlay.addEventListener('click', () => {
-  const url = iframe?.src;
-  if (url) window.open(url, '_blank', 'noopener');
-});
-
-/* Raycaster für Klick auf Spheres */
-const raycaster = new THREE.Raycaster();
-const pointer = new THREE.Vector2();
-function onPointerMove(event) {
-  const x = event.touches ? event.touches[0].clientX : event.clientX;
-  const y = event.touches ? event.touches[0].clientY : event.clientY;
-  pointer.x = (x / window.innerWidth) * 2 - 1;
-  pointer.y = -(y / window.innerHeight) * 2 + 1;
-}
-function onPointerDown() {
-  raycaster.setFromCamera(pointer, camera);
-  const objects = spheres.map(s => s.mesh);
-  const hits = raycaster.intersectObjects(objects, true);
-  if (hits.length > 0) {
-    const root = hits[0].object;
-    const found = spheres.find(s => root === s.mesh || root.parent === s.mesh);
-    if (found) showOverlay(found.url);
-  }
-}
-window.addEventListener('mousemove', onPointerMove, { passive: true });
-window.addEventListener('mousedown', onPointerDown);
-window.addEventListener('touchstart', (e) => { onPointerMove(e); }, { passive: true });
-window.addEventListener('touchend', onPointerDown);
-
-/* === Animation === */
-const SNAP_IN  = 7.5;  // z-Entfernung zur Kamera, bei der Overlay einblendet
-const SNAP_OUT = 10.5; // z-Entfernung, bei der Overlay wieder ausgeblendet wird
-const MAX_VIS_Z = 80;  // Sicht-/Skalierbereich
-
-function animate(time = 0) {
-  time *= 0.001;
-
-  // sanftes Nachziehen zum Ziel
-  phase += (targetPhase - phase) * 0.08;
-  if (phase < 0) phase = 0;
-
-  camera.position.set(0, 0, 5);
-  camera.lookAt(0, 0, 0);
-
-  updateTunnel(time);
-
-  // Spheres an phase koppeln (sie „fahren“ mit dem Tunnel):
-  spheres.forEach((s, i) => {
-    // spiralige Bahn (leicht)
-    const wobble = 0.15 * Math.sin(time * 2 + i);
-    s.mesh.position.x = Math.cos(s.angle + time * 0.07) * (s.r + wobble);
-    s.mesh.position.y = Math.sin(s.angle + time * 0.07) * (s.r + wobble);
-
-    // Z-Position: zur Kamera hin bewegen, wenn phase steigt
-    s.mesh.position.z = s.baseZ + phase * SCROLL_SCALE * 10; // Faktor 10 = „Reisegeschwindigkeit“ der Anker
-
-    // Sichtbarkeit/Skalierung in Abhängigkeit zur Kamera-z
-    const zDist = Math.abs((camera.position.z - s.mesh.position.z));
-    const nearFactor = THREE.MathUtils.clamp(1 - (zDist / MAX_VIS_Z), 0, 1);
-    const pulse = 1 + 0.08 * Math.sin(time * 5 + i);
-    const scale = THREE.MathUtils.lerp(0.85, 1.35, nearFactor) * pulse;
-    s.mesh.scale.setScalar(scale);
-
-    // Snap-Overlay
-    const isOverlayOpen = overlay.classList.contains('visible');
-    if (!isOverlayOpen && zDist < SNAP_IN && navVisible) {
-      showOverlay(s.url);
-    } else if (isOverlayOpen && zDist > SNAP_OUT) {
-      hideOverlay();
+// ==== Layout/Animation ====
+function showPage(index) {
+  pages.forEach((page,i)=>{
+    if(i === index){
+      page.style.transform = `scale(0.6)`;
+      page.style.opacity = 1;
+      page.style.zIndex = 100;
+    } else if(i < index){
+      page.style.transform = `scale(1.2)`;
+      page.style.opacity = 0;
+      page.style.zIndex = 50;
+    } else {
+      page.style.transform = `scale(0)`;
+      page.style.opacity = 0;
+      page.style.zIndex = 0;
     }
   });
-
-  renderer.render(scene, camera);
-  requestAnimationFrame(animate);
 }
-animate();
 
-/* === Resize === */
-window.addEventListener('resize', () => {
-  camera.aspect = window.innerWidth / window.innerHeight;
-  camera.updateProjectionMatrix();
-  renderer.setSize(window.innerWidth, window.innerHeight);
+showPage(currentPage);
+
+// ==== Endless Loop: neue Fake-Seiten erzeugen ====
+function ensureNextPage() {
+  if(currentPage >= pages.length - 2){
+    originalPagesData.slice(1).forEach(d=>{
+      const p = createPage(d);
+      pages.push(p);
+    });
+  }
+}
+
+// ==== Scroll / Wheel ====
+window.addEventListener('wheel', e=>{
+  if(overlaySystem.classList.contains("paused")) return;
+  if(e.deltaY > 0) currentPage++;
+  else if(e.deltaY < 0 && currentPage>0) currentPage--;
+  ensureNextPage();
+  showPage(currentPage);
+});
+
+// ==== Touch Scroll ====
+let touchStartY = 0;
+window.addEventListener('touchstart', e => touchStartY = e.touches[0].clientY);
+window.addEventListener('touchend', e => {
+  if(overlaySystem.classList.contains("paused")) return;
+  let touchEndY = e.changedTouches[0].clientY;
+  if(touchStartY > touchEndY + 10) currentPage++;
+  else if(touchStartY < touchEndY - 10 && currentPage>0) currentPage--;
+  ensureNextPage();
+  showPage(currentPage);
+});
+
+// ==== Drag Overlay ====
+let startX = 0, currentX = 0, dragging = false;
+overlaySystem.addEventListener("mousedown", startDrag);
+overlaySystem.addEventListener("touchstart", startDrag);
+window.addEventListener("mousemove", moveDrag);
+overlaySystem.addEventListener("touchmove", moveDrag);
+window.addEventListener("mouseup", endDrag);
+overlaySystem.addEventListener("touchend", endDrag);
+
+function startDrag(e){
+  if(!e.target.classList.contains("click-overlay")) return;
+  dragging = true;
+  startX = e.clientX || e.touches[0].clientX;
+  overlaySystem.style.transition = "none";
+}
+function moveDrag(e){
+  if(!dragging) return;
+  currentX = (e.clientX || e.touches[0].clientX) - startX;
+  if(currentX > 0) overlaySystem.style.transform = `translateX(${currentX}px)`;
+}
+function endDrag(){
+  if(!dragging) return;
+  dragging = false;
+  overlaySystem.style.transition = "transform 0.6s cubic-bezier(0.25, 0.1, 0.25, 1)";
+  if(currentX > window.innerWidth/3){
+    overlaySystem.classList.add("paused");
+    document.querySelectorAll(".iframe-container").forEach(c=>c.querySelector("iframe").style.pointerEvents = "none");
+  } else {
+    overlaySystem.classList.remove("paused");
+    document.querySelectorAll(".iframe-container").forEach(c=>{
+      c.querySelector("iframe").style.pointerEvents = c.classList.contains("active") ? 'auto' : 'none';
+    });
+  }
+  overlaySystem.style.transform = "";
+}
+
+// ==== Klick Overlay zurück ====
+overlaySystem.addEventListener('click', e=>{
+  if(overlaySystem.classList.contains('paused')){
+    overlaySystem.classList.remove('paused');
+    document.querySelectorAll(".iframe-container").forEach(c=>{
+      c.querySelector("iframe").style.pointerEvents = c.classList.contains("active") ? 'auto' : 'none';
+    });
+    e.stopPropagation();
+  }
 });
 </script>
+
 </body>
 </html>
