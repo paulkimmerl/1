@@ -117,13 +117,12 @@ html, body {
 <script>
 const overlaySystem = document.getElementById("overlay-system");
 
-// ==== Originale Seiten ====
+// ==== Seiten aus context.txt / GitHub ====
 const originalPagesData = [
-  {title: "Start"},
-  {title: "Seite 1", src: "https://example.com"},
-  {title: "Seite 2", src: "https://example.com"},
-  {title: "Seite 3", src: "https://example.com"},
-  {title: "Seite 4", src: "https://example.com"},
+  {title: "Portfolio Projekt Showcase", src: "https://paulkimmerl.github.io/", description: "Schau dir meine Projekte an."},
+  {title: "Test Seite", src: "https://paulkimmerl.github.io/s/", description: "Tatata Testseite."},
+  {title: "Webbasierter OBJ-Viewer", src: "https://paulkimmerl.github.io/objviewer1/", description: "3D-Modelle direkt im Browser ansehen."},
+  {title: "Intermediate Video Collection", src: "https://www.liovast.com/umkrempler", description: "Videos für Fortgeschrittene."}
 ];
 
 let pages = [];
@@ -222,7 +221,7 @@ showPage(currentPage);
 // ==== Endless Loop: neue Fake-Seiten erzeugen ====
 function ensureNextPage() {
   if(currentPage >= pages.length - 2){
-    originalPagesData.slice(1).forEach(d=>{
+    originalPagesData.forEach(d=>{
       const p = createPage(d);
       pages.push(p);
     });
