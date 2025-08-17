@@ -21,6 +21,7 @@ html, body {
   height: 100%;
   border: none;
   z-index: 0;
+  pointer-events: auto; /* Hintergrund immer interaktiv */
 }
 
 #overlay-system {
@@ -106,6 +107,27 @@ html, body {
   opacity: 0;
   pointer-events: none;
 }
+
+#overlay-controller {
+  position: fixed;
+  inset: 0;
+  z-index: 30;
+  pointer-events: none;
+  cursor: pointer;
+}
+#overlay-controller.active {
+  pointer-events: auto;
+}
+
+/* Startseite Rahmen */
+.start-frame {
+  border: 4px solid #ccc;
+  width: 80%;
+  height: 80%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
 </style>
 </head>
 <body>
@@ -113,16 +135,19 @@ html, body {
 <iframe id="tunnel-background" src="https://paulkimmerl.github.io/tunnel/"></iframe>
 
 <div id="overlay-system"></div>
+<div id="overlay-controller"></div>
 
 <script>
 const overlaySystem = document.getElementById("overlay-system");
+const overlayController = document.getElementById("overlay-controller");
 
-// ==== Seiten aus context.txt / GitHub ====
+// ==== Originale Seiten ====
 const originalPagesData = [
-  {title: "Portfolio Projekt Showcase", src: "https://paulkimmerl.github.io/", description: "Schau dir meine Projekte an."},
-  {title: "Test Seite", src: "https://paulkimmerl.github.io/s/", description: "Tatata Testseite."},
-  {title: "Webbasierter OBJ-Viewer", src: "https://paulkimmerl.github.io/objviewer1/", description: "3D-Modelle direkt im Browser ansehen."},
-  {title: "Intermediate Video Collection", src: "https://www.liovast.com/umkrempler", description: "Videos für Fortgeschrittene."}
+  {title: "Start"},
+  {title: "Webseite", src: "https://paulkimmerl.github.io/paulkimmerl/"},
+  {title: "Test Seite", src: "https://paulkimmerl.github.io/s/"},
+  {title: "Objviewer", src: "https://paulkimmerl.github.io/objviewer1/"},
+  {title: "Intermediate", src: "https://www.liovast.com/umkrempler"}
 ];
 
 let pages = [];
@@ -181,10 +206,11 @@ function createPage(data) {
       }
     });
   } else {
-    const title = document.createElement("div");
-    title.classList.add("title");
-    title.textContent = data.title;
-    page.appendChild(title);
+    // Startseite mit Rahmen
+    const frame = document.createElement("div");
+    frame.classList.add("start-frame");
+    frame.textContent = "Archiv"; // Einfacher Text im Rahmen
+    page.appendChild(frame);
   }
 
   overlaySystem.appendChild(page);
@@ -221,7 +247,7 @@ showPage(currentPage);
 // ==== Endless Loop: neue Fake-Seiten erzeugen ====
 function ensureNextPage() {
   if(currentPage >= pages.length - 2){
-    originalPagesData.forEach(d=>{
+    originalPagesData.slice(1).forEach(d=>{
       const p = createPage(d);
       pages.push(p);
     });
@@ -283,7 +309,35 @@ function endDrag(){
     });
   }
   overlaySystem.style.transform = "";
+  updateController();
 }
+
+// ==== Overlay Controller ====
+function updateController() {
+  if(overlaySystem.classList.contains('paused')){
+    overlayController.classList.add('active');
+  } else {
+    overlayController.classList.remove('active');
+  }
+}
+
+overlayController.addEventListener('click', e=>{
+  if(overlaySystem.classList.contains('paused')){
+    overlaySystem.classList.remove('paused');
+    document.querySelectorAll(".iframe-container").forEach(c=>{
+      const overlay = c.querySelector(".click-overlay");
+      const iframe = c.querySelector("iframe");
+      const title = c.querySelector(".title");
+      if(!c.classList.contains("active")){
+        overlay.style.pointerEvents = 'auto';
+        overlay.classList.remove("hidden-overlay");
+        iframe.style.pointerEvents = 'none';
+        title.style.opacity = 1;
+      }
+    });
+    updateController();
+  }
+});
 
 // ==== Klick Overlay zurück ====
 overlaySystem.addEventListener('click', e=>{
@@ -292,6 +346,7 @@ overlaySystem.addEventListener('click', e=>{
     document.querySelectorAll(".iframe-container").forEach(c=>{
       c.querySelector("iframe").style.pointerEvents = c.classList.contains("active") ? 'auto' : 'none';
     });
+    updateController();
     e.stopPropagation();
   }
 });
