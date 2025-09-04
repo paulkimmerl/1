@@ -1,356 +1,168 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Smooth Overlay Pause Endless</title>
-<style>
-html, body {
-  margin: 0;
-  padding: 0;
-  height: 100%;
-  overflow: hidden;
-  font-family: Arial, sans-serif;
-}
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Blur mit Text & Bild</title>
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      width: 100%;
+      background: black;
+      font-family: sans-serif;
+      color: white;
+      box-sizing: border-box;
+    }
 
-#tunnel-background {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  border: none;
-  z-index: 0;
-  pointer-events: auto; /* Hintergrund immer interaktiv */
-}
+    .h-line {
+      position: fixed;
+      left: 0;
+      width: 100vw;
+      height: 1px;
+      background: rgba(255,255,255,0.2);
+      z-index: 5;
+    }
 
-#overlay-system {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  z-index: 10;
-  touch-action: none;
-  transition: transform 0.6s cubic-bezier(0.25, 0.1, 0.25, 1);
-  transform: translateX(0);
-}
+    .blur-wrapper {
+      position: fixed;
+      left: 1cm;
+      right: 1cm;
+      bottom: 0;
+      max-height: 70vh; /* max Höhe insgesamt */
+      display: flex;
+      justify-content: center;
+      flex-direction: column;
+      z-index: 10;
+    }
 
-#overlay-system.paused {
-  transform: translateX(60%);
-}
+    .blur-box {
+      width: 100%;
+      background: rgba(255, 255, 255, 0.12);
+      backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
+      padding: 1rem;
+      display: flex;
+      flex-direction: row;
+      gap: 1rem;
+      box-sizing: border-box;
+      max-height: 100%;
+      height: 100%;
+      overflow: hidden;
+    }
 
-.page {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  transform-origin: center center;
-  transition: transform 0.6s ease, opacity 0.6s ease;
-  opacity: 0;
-  transform: scale(0);
-  z-index: 1;
-}
+    .text-content {
+      flex: 1;
+      text-align: left;
+      white-space: pre-wrap;
+      overflow-y: auto;
+      height: 100%;
+      max-height: 100%;
+      padding-right: 0.5rem;
 
-.title {
-  position: absolute;
-  top: 20px;
-  left: 20px;
-  color: #ccc;
-  font-size: 2rem;
-  text-shadow: 1px 1px 5px black;
-  z-index: 10;
-  transition: opacity 0.6s ease;
-}
+      scrollbar-width: thin;
+      scrollbar-color: rgba(255,255,255,0.2) transparent;
 
-.iframe-container {
-  position: relative;
-  width: 100vw;
-  height: 100vh;
-  transition: transform 0.6s ease, opacity 0.6s ease;
-  transform-origin: center center;
-  transform: scale(0.6);
-}
+      position: relative;
+      /* smooth transparent fade oben und unten */
+      mask-image: linear-gradient(to bottom, transparent, black 10%, black 90%, transparent);
+      -webkit-mask-image: linear-gradient(to bottom, transparent, black 10%, black 90%, transparent);
+    }
 
-.iframe-container.active {
-  transform: scale(1.2);
-  z-index: 999;
-}
+    .image-content {
+      flex: 1;
+      height: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      overflow: hidden;
+    }
 
-.iframe-container iframe {
-  width: 100%;
-  height: 100%;
-  border: none;
-  pointer-events: none;
-  filter: blur(5px);
-  transition: filter 0.6s ease;
-}
+    .image-content img {
+      height: 100%;    /* Bild gleiche Höhe wie Text */
+      width: auto;
+      object-fit: cover;
+      border-radius: 0;
+      max-width: 100%;
 
-.iframe-container.active iframe {
-  pointer-events: auto;
-  filter: blur(0);
-}
+      /* gewünschte transform aus deinem Beispiel */
+      transform: scale(1) translateY(0);
+      transition: transform 0.3s ease;
+    }
 
-.click-overlay {
-  position: absolute;
-  inset: 0;
-  cursor: grab;
-  z-index: 20;
-  transition: opacity 0.6s ease;
-}
+    #line-above {
+      bottom: calc(100% + 1px);
+    }
 
-.click-overlay.hidden-overlay {
-  opacity: 0;
-  pointer-events: none;
-}
+    #line-below {
+      bottom: 0;
+    }
 
-#overlay-controller {
-  position: fixed;
-  inset: 0;
-  z-index: 30;
-  pointer-events: none;
-  cursor: pointer;
-}
-#overlay-controller.active {
-  pointer-events: auto;
-}
+    /* Mobile Layout: Bild unter Text, Bildbreite = Textbreite */
+    @media (max-width: 767px) {
+      .blur-box {
+        flex-direction: column;
+        max-height: none;
+        height: auto;
+      }
 
-/* Startseite Rahmen */
-.start-frame {
-  border: 4px solid #ccc;
-  width: 80%;
-  height: 80%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-</style>
+      .text-content, .image-content {
+        height: auto;
+        max-height: none;
+        flex: none;
+        width: 100%;
+      }
+
+      .image-content img {
+        width: 100%;   /* Bild volle Breite */
+        height: auto;  /* proportional */
+        object-fit: contain;
+
+        /* transform beibehalten */
+        transform: scale(1) translateY(0);
+      }
+    }
+  </style>
 </head>
 <body>
 
-<iframe id="tunnel-background" src="https://paulkimmerl.github.io/tunnel/"></iframe>
+  <div class="h-line" id="line-above"></div>
+  <div class="h-line" id="line-below"></div>
 
-<div id="overlay-system"></div>
-<div id="overlay-controller"></div>
+  <div class="blur-wrapper" id="blur-wrapper">
+    <div class="blur-box" id="blur-box">
+      <div class="text-content" id="text-content">
+        Wird geladen...
+      </div>
+      <div class="image-content">
+        <img src="image.png" alt="Bild" />
+      </div>
+    </div>
+  </div>
 
-<script>
-const overlaySystem = document.getElementById("overlay-system");
-const overlayController = document.getElementById("overlay-controller");
+  <script>
+    function updateLineAbove() {
+      const blurWrapper = document.getElementById('blur-wrapper');
+      const lineAbove = document.getElementById('line-above');
+      const rect = blurWrapper.getBoundingClientRect();
+      const windowHeight = window.innerHeight;
+      lineAbove.style.bottom = (windowHeight - rect.top) + 'px';
+    }
 
-// ==== Originale Seiten ====
-const originalPagesData = [
-  {title: "Start"},
-  {title: "Webseite", src: "https://paulkimmerl.github.io/paulkimmerl/"},
-  {title: "Test Seite", src: "https://paulkimmerl.github.io/s/"},
-  {title: "Objviewer", src: "https://paulkimmerl.github.io/objviewer1/"},
-  {title: "Intermediate", src: "https://www.liovast.com/umkrempler"}
-];
-
-let pages = [];
-let currentPage = 0;
-
-// ==== Funktion um Page zu erstellen ====
-function createPage(data) {
-  const page = document.createElement("div");
-  page.classList.add("page");
-
-  if(data.src) {
-    const container = document.createElement("div");
-    container.classList.add("iframe-container");
-
-    const iframe = document.createElement("iframe");
-    iframe.src = data.src;
-
-    const overlay = document.createElement("div");
-    overlay.classList.add("click-overlay");
-
-    const title = document.createElement("div");
-    title.classList.add("title");
-    title.textContent = data.title;
-
-    container.appendChild(iframe);
-    container.appendChild(overlay);
-    container.appendChild(title);
-    page.appendChild(container);
-
-    // Click Overlay
-    overlay.addEventListener("click", e => {
-      e.stopPropagation();
-      if(overlaySystem.classList.contains("paused")) return;
-
-      document.querySelectorAll(".iframe-container").forEach(c=>{
-        c.classList.remove("active");
-        c.querySelector(".click-overlay").classList.remove("hidden-overlay");
-        c.querySelector("iframe").style.pointerEvents = "none";
-        const t = c.querySelector(".title");
-        if(t) t.style.opacity = 1;
+    fetch('content.txt')
+      .then(res => res.text())
+      .then(text => {
+        document.getElementById('text-content').innerText = text;
+        updateLineAbove();
+      })
+      .catch(err => {
+        document.getElementById('text-content').innerText = 'Fehler beim Laden: ' + err.message;
       });
 
-      container.classList.add("active");
-      overlay.classList.add("hidden-overlay");
-      iframe.style.pointerEvents = "auto";
-      title.style.opacity = 0;
-    });
-
-    document.addEventListener("click", e => {
-      if(overlaySystem.classList.contains("paused")) return;
-      if(!container.contains(e.target)){
-        container.classList.remove("active");
-        overlay.classList.remove("hidden-overlay");
-        iframe.style.pointerEvents = "none";
-        title.style.opacity = 1;
-      }
-    });
-  } else {
-    // Startseite mit Rahmen
-    const frame = document.createElement("div");
-    frame.classList.add("start-frame");
-    frame.textContent = "Archiv"; // Einfacher Text im Rahmen
-    page.appendChild(frame);
-  }
-
-  overlaySystem.appendChild(page);
-  return page;
-}
-
-// ==== Alle Originalseiten erstellen ====
-originalPagesData.forEach(d=>{
-  const p = createPage(d);
-  pages.push(p);
-});
-
-// ==== Layout/Animation ====
-function showPage(index) {
-  pages.forEach((page,i)=>{
-    if(i === index){
-      page.style.transform = `scale(0.6)`;
-      page.style.opacity = 1;
-      page.style.zIndex = 100;
-    } else if(i < index){
-      page.style.transform = `scale(1.2)`;
-      page.style.opacity = 0;
-      page.style.zIndex = 50;
-    } else {
-      page.style.transform = `scale(0)`;
-      page.style.opacity = 0;
-      page.style.zIndex = 0;
-    }
-  });
-}
-
-showPage(currentPage);
-
-// ==== Endless Loop: neue Fake-Seiten erzeugen ====
-function ensureNextPage() {
-  if(currentPage >= pages.length - 2){
-    originalPagesData.slice(1).forEach(d=>{
-      const p = createPage(d);
-      pages.push(p);
-    });
-  }
-}
-
-// ==== Scroll / Wheel ====
-window.addEventListener('wheel', e=>{
-  if(overlaySystem.classList.contains("paused")) return;
-  if(e.deltaY > 0) currentPage++;
-  else if(e.deltaY < 0 && currentPage>0) currentPage--;
-  ensureNextPage();
-  showPage(currentPage);
-});
-
-// ==== Touch Scroll ====
-let touchStartY = 0;
-window.addEventListener('touchstart', e => touchStartY = e.touches[0].clientY);
-window.addEventListener('touchend', e => {
-  if(overlaySystem.classList.contains("paused")) return;
-  let touchEndY = e.changedTouches[0].clientY;
-  if(touchStartY > touchEndY + 10) currentPage++;
-  else if(touchStartY < touchEndY - 10 && currentPage>0) currentPage--;
-  ensureNextPage();
-  showPage(currentPage);
-});
-
-// ==== Drag Overlay ====
-let startX = 0, currentX = 0, dragging = false;
-overlaySystem.addEventListener("mousedown", startDrag);
-overlaySystem.addEventListener("touchstart", startDrag);
-window.addEventListener("mousemove", moveDrag);
-overlaySystem.addEventListener("touchmove", moveDrag);
-window.addEventListener("mouseup", endDrag);
-overlaySystem.addEventListener("touchend", endDrag);
-
-function startDrag(e){
-  if(!e.target.classList.contains("click-overlay")) return;
-  dragging = true;
-  startX = e.clientX || e.touches[0].clientX;
-  overlaySystem.style.transition = "none";
-}
-function moveDrag(e){
-  if(!dragging) return;
-  currentX = (e.clientX || e.touches[0].clientX) - startX;
-  if(currentX > 0) overlaySystem.style.transform = `translateX(${currentX}px)`;
-}
-function endDrag(){
-  if(!dragging) return;
-  dragging = false;
-  overlaySystem.style.transition = "transform 0.6s cubic-bezier(0.25, 0.1, 0.25, 1)";
-  if(currentX > window.innerWidth/3){
-    overlaySystem.classList.add("paused");
-    document.querySelectorAll(".iframe-container").forEach(c=>c.querySelector("iframe").style.pointerEvents = "none");
-  } else {
-    overlaySystem.classList.remove("paused");
-    document.querySelectorAll(".iframe-container").forEach(c=>{
-      c.querySelector("iframe").style.pointerEvents = c.classList.contains("active") ? 'auto' : 'none';
-    });
-  }
-  overlaySystem.style.transform = "";
-  updateController();
-}
-
-// ==== Overlay Controller ====
-function updateController() {
-  if(overlaySystem.classList.contains('paused')){
-    overlayController.classList.add('active');
-  } else {
-    overlayController.classList.remove('active');
-  }
-}
-
-overlayController.addEventListener('click', e=>{
-  if(overlaySystem.classList.contains('paused')){
-    overlaySystem.classList.remove('paused');
-    document.querySelectorAll(".iframe-container").forEach(c=>{
-      const overlay = c.querySelector(".click-overlay");
-      const iframe = c.querySelector("iframe");
-      const title = c.querySelector(".title");
-      if(!c.classList.contains("active")){
-        overlay.style.pointerEvents = 'auto';
-        overlay.classList.remove("hidden-overlay");
-        iframe.style.pointerEvents = 'none';
-        title.style.opacity = 1;
-      }
-    });
-    updateController();
-  }
-});
-
-// ==== Klick Overlay zurück ====
-overlaySystem.addEventListener('click', e=>{
-  if(overlaySystem.classList.contains('paused')){
-    overlaySystem.classList.remove('paused');
-    document.querySelectorAll(".iframe-container").forEach(c=>{
-      c.querySelector("iframe").style.pointerEvents = c.classList.contains("active") ? 'auto' : 'none';
-    });
-    updateController();
-    e.stopPropagation();
-  }
-});
-</script>
+    window.addEventListener('load', updateLineAbove);
+    window.addEventListener('resize', updateLineAbove);
+  </script>
 
 </body>
 </html>
