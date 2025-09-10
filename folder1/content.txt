@@ -1,0 +1,14 @@
+Motion Design System
+
+In the "Hidden Layers" project, our team developed a cohesive motion design system for the 2024 Design & AI Conference. 
+We reinterpreted the institution’s corporate identity to create a flexible design framework, setting clear guidelines for visual elements, motion, and composition. My primary role was in the conceptual phase, where I helped shape the overall look and feel by defining the visual rules.
+
+Production
+
+During production, I focused on creating generative background visuals based on our motion design system, establishing the foundation for the conference’s visual identity. In the role of creative director, I contributed by overseeing the organization and coordination of the production process to ensure consistency and timely delivery.
+Programms
+
+    Adobe Illustrator
+    Adobe After Effects
+    vvvv Gamma
+    Blender
