@@ -3,19 +3,20 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Fullpage Blur Containers</title>
+<title>Scroll Snap Container</title>
 <style>
   html, body {
     margin: 0;
     padding: 0;
     height: 100%;
     width: 100%;
-    overflow-y: scroll;
-    scroll-behavior: smooth;
+    overflow-y: hidden; /* Scrollen deaktiviert standardmäßig */
     font-family: sans-serif;
   }
 
-  body {
+  body.scrollable {
+    overflow-y: scroll; /* Scrollen nur wenn Klasse aktiv */
+    scroll-behavior: smooth;
     scroll-snap-type: y mandatory;
   }
 
@@ -26,10 +27,8 @@
     display: flex;
     justify-content: center;
     align-items: flex-end; /* Container unten */
-    position: relative;
   }
 
-  /* Hintergrund iFrame */
   .bg-iframe {
     position: fixed;
     top: 50%;
@@ -39,22 +38,13 @@
     border: none;
     z-index: 0;
     transform: translate(-50%, -50%);
-    pointer-events: none; /* Hintergrund kann angeklickt werden, wenn Container nicht */
   }
 
-  /* Container iFrame */
   .container-frame {
     width: 100%;
-    max-height: 50vh; /* größer als vorher */
+    max-height: 60vh; /* größer als vorher */
     border: none;
     z-index: 10;
-    pointer-events: auto; /* Interaktion auf Container möglich */
-  }
-
-  @media (max-width: 767px) {
-    .container-frame {
-      max-height: 60vh;
-    }
   }
 </style>
 </head>
@@ -63,12 +53,22 @@
   <!-- Fixer Hintergrund -->
   <iframe class="bg-iframe" src="https://paulkimmerl.github.io/tunnel/"></iframe>
 
-  <!-- Mehrere Container-Sectionen -->
+  <!-- Mehrere Container -->
   <div class="section"><iframe class="container-frame" src="folder1/container.html"></iframe></div>
   <div class="section"><iframe class="container-frame" src="folder1/container.html"></iframe></div>
   <div class="section"><iframe class="container-frame" src="folder1/container.html"></iframe></div>
   <div class="section"><iframe class="container-frame" src="folder1/container.html"></iframe></div>
   <div class="section"><iframe class="container-frame" src="folder1/container.html"></iframe></div>
+
+<script>
+  const body = document.body;
+  const containers = document.querySelectorAll('.container-frame');
+
+  containers.forEach(container => {
+    container.addEventListener('mouseenter', () => body.classList.add('scrollable'));
+    container.addEventListener('mouseleave', () => body.classList.remove('scrollable'));
+  });
+</script>
 
 </body>
 </html>
