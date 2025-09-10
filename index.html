@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Index mit iFrame-Hintergrund</title>
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      width: 100%;
+      background: black;
+      font-family: sans-serif;
+      color: white;
+      overflow-x: hidden;
+    }
+
+    /* Hintergrund Tunnel iFrame */
+    .bg-iframe {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      width: 100%;
+      height: 100%;
+      border: none;
+      z-index: 0;
+      opacity: 1;
+      transform: translate(-50%, -50%) scale(1.3);
+      transform-origin: center center;
+    }
+
+    /* Container Wrapper */
+    .container-wrapper {
+      position: relative; /* über iFrame */
+      z-index: 10;
+      display: flex;
+      flex-direction: column;
+      gap: 2rem; /* Abstand zwischen Containern */
+      padding: 2rem;
+    }
+
+    iframe.container {
+      width: 100%;
+      height: 50vh; /* Höhe je Container, anpassbar */
+      border: none;
+      display: block;
+    }
+
+    @media (max-width: 767px) {
+      iframe.container {
+        height: 40vh;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Hintergrund iFrame -->
+  <iframe src="https://paulkimmerl.github.io/tunnel/" class="bg-iframe"></iframe>
+
+  <!-- Container Inhalte -->
+  <div class="container-wrapper">
+    <iframe src="folder1/container.html" class="container"></iframe>
+    <iframe src="folder2/container.html" class="container"></iframe>
+  </div>
+
+</body>
+</html>
