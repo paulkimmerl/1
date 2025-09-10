@@ -10,23 +10,8 @@
     padding: 0;
     height: 100%;
     width: 100%;
-    overflow-y: hidden; /* Scrollen deaktiviert standardmäßig */
+    overflow: hidden; /* Body nicht scrollen */
     font-family: sans-serif;
-  }
-
-  body.scrollable {
-    overflow-y: scroll; /* Scrollen nur wenn Klasse aktiv */
-    scroll-behavior: smooth;
-    scroll-snap-type: y mandatory;
-  }
-
-  .section {
-    width: 100%;
-    height: 100vh;
-    scroll-snap-align: start;
-    display: flex;
-    justify-content: center;
-    align-items: flex-end; /* Container unten */
   }
 
   .bg-iframe {
@@ -38,13 +23,32 @@
     border: none;
     z-index: 0;
     transform: translate(-50%, -50%);
+    pointer-events: auto; /* Hintergrund interaktiv */
+  }
+
+  .sections-wrapper {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    scroll-snap-type: y mandatory;
+    overflow-y: auto; /* Scrollen nur innerhalb Wrapper */
+  }
+
+  .section {
+    width: 100%;
+    height: 100vh;
+    scroll-snap-align: start;
+    display: flex;
+    justify-content: center;
+    align-items: flex-end; /* Container unten */
   }
 
   .container-frame {
-    width: 100%;
-    max-height: 60vh; /* größer als vorher */
+    width: 100%;      /* ganze Breite */
+    max-height: 70vh; /* größere Höhe */
     border: none;
     z-index: 10;
+    pointer-events: auto; /* Mausinteraktion */
   }
 </style>
 </head>
@@ -53,20 +57,22 @@
   <!-- Fixer Hintergrund -->
   <iframe class="bg-iframe" src="https://paulkimmerl.github.io/tunnel/"></iframe>
 
-  <!-- Mehrere Container -->
-  <div class="section"><iframe class="container-frame" src="folder1/container.html"></iframe></div>
-  <div class="section"><iframe class="container-frame" src="folder1/container.html"></iframe></div>
-  <div class="section"><iframe class="container-frame" src="folder1/container.html"></iframe></div>
-  <div class="section"><iframe class="container-frame" src="folder1/container.html"></iframe></div>
-  <div class="section"><iframe class="container-frame" src="folder1/container.html"></iframe></div>
+  <div class="sections-wrapper">
+    <div class="section"><iframe class="container-frame" src="folder1/container.html"></iframe></div>
+    <div class="section"><iframe class="container-frame" src="folder1/container.html"></iframe></div>
+    <div class="section"><iframe class="container-frame" src="folder1/container.html"></iframe></div>
+    <div class="section"><iframe class="container-frame" src="folder1/container.html"></iframe></div>
+    <div class="section"><iframe class="container-frame" src="folder1/container.html"></iframe></div>
+  </div>
 
 <script>
-  const body = document.body;
+  // Scroll nur aktivieren, wenn Maus über Container
+  const wrapper = document.querySelector('.sections-wrapper');
   const containers = document.querySelectorAll('.container-frame');
 
   containers.forEach(container => {
-    container.addEventListener('mouseenter', () => body.classList.add('scrollable'));
-    container.addEventListener('mouseleave', () => body.classList.remove('scrollable'));
+    container.addEventListener('mouseenter', () => wrapper.style.overflowY = 'auto');
+    container.addEventListener('mouseleave', () => wrapper.style.overflowY = 'hidden');
   });
 </script>
 
