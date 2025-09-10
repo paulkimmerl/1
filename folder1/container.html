@@ -1,6 +1,86 @@
-<div class="blur-wrapper" id="blur-wrapper-1">
-  <div class="blur-box" id="blur-box-1">
-    <div class="text-content" id="text-content-1"></div>
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Blur mit Text & Bild</title>
+<style>
+html, body {
+  margin: 0; padding: 0; height: 100%; width: 100%;
+  background: transparent; /* wichtig: transparent, damit der iFrame-Hintergrund sichtbar ist */
+  font-family: sans-serif;
+  color: rgba(255,255,255,0.7);
+  font-weight: 300;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+.blur-wrapper {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+  max-height: 40vh;
+}
+
+.blur-box {
+  width: 100%;
+  background: rgba(255, 255, 255, 0.12);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  padding: 1rem;
+  display: flex;
+  flex-direction: row;
+  gap: 1rem;
+  box-sizing: border-box;
+  height: 100%;
+  overflow: hidden;
+}
+
+.text-content {
+  flex: 1;
+  text-align: left;
+  overflow-y: auto;
+  max-height: 100%;
+  padding: 0.5rem;
+  white-space: pre-wrap;
+  mask-image: linear-gradient(to bottom, black 85%, transparent 100%);
+  -webkit-mask-image: linear-gradient(to bottom, black 85%, transparent 100%);
+}
+
+.text-content h2 {
+  font-size: 1.8rem; font-weight: 300; margin: 0 0 0.5rem 0;
+}
+
+.text-content p {
+  font-size: 1rem; margin: 0; line-height: 1.5;
+}
+
+.image-content {
+  width: 50%;
+  height: 100%;
+  overflow: hidden;
+}
+
+.image-content img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center right;
+}
+
+@media (max-width: 767px) {
+  .blur-box { flex-direction: column; height: auto; }
+  .text-content, .image-content { width: 100%; height: auto; }
+  .text-content h2 { font-size: 1.6rem; }
+}
+</style>
+</head>
+<body>
+
+<div class="blur-wrapper">
+  <div class="blur-box">
+    <div class="text-content" id="text-content"></div>
     <div class="image-content">
       <img src="image.png" alt="Bild" />
     </div>
@@ -8,21 +88,22 @@
 </div>
 
 <script>
-async function loadText(containerId, textId) {
+async function loadText() {
   try {
     const res = await fetch('content.txt');
     const fullText = await res.text();
     const lines = fullText.split('\n');
-
     let html = '';
     if(lines.length > 0) html += `<h2>${lines.shift().trim()}</h2>`;
     if(lines.length > 0) html += `<p>${lines.join('\n')}</p>`;
-
-    document.getElementById(textId).innerHTML = html;
+    document.getElementById('text-content').innerHTML = html;
   } catch(err) {
-    document.getElementById(textId).innerHTML = '<h2>Fehler</h2><p>' + err.message + '</p>';
+    document.getElementById('text-content').innerHTML =
+      '<h2>Fehler</h2><p>' + err.message + '</p>';
   }
 }
-
-loadText('blur-wrapper-1', 'text-content-1');
+loadText();
 </script>
+
+</body>
+</html>
