@@ -1,57 +1,46 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Index mit Hintergrund</title>
-<style>
-html, body {
-  margin: 0;
-  padding: 0;
-  width: 100%;
-  height: 100%;
-  overflow-x: hidden;
-}
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Index mit Hintergrund</title>
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background: black;
+    }
 
-.bg-iframe {
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  width: 100%;
-  height: 100%;
-  transform: translate(-50%, -50%) scale(1.2);
-  z-index: 0;
-  border: none;
-  pointer-events: auto;
-}
+    iframe#bg-frame {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      width: 100%;
+      height: 100%;
+      border: none;
+      transform: translate(-50%, -50%);
+      z-index: 0;
+    }
 
-.container-wrapper {
-  position: relative;
-  z-index: 10;
-}
-</style>
+    iframe#container-frame {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      border: none;
+      z-index: 1;
+    }
+  </style>
 </head>
 <body>
 
-<iframe class="bg-iframe" src="https://paulkimmerl.github.io/tunnel/"></iframe>
+  <!-- Hintergrund -->
+  <iframe id="bg-frame" src="https://paulkimmerl.github.io/tunnel/"></iframe>
 
-<div class="container-wrapper" id="container-wrapper"></div>
-
-<script>
-// Beispiel: 3 Container untereinander
-const repeat = 3;
-const wrapper = document.getElementById('container-wrapper');
-
-for (let i = 0; i < repeat; i++) {
-  fetch('folder1/container.html')
-    .then(res => res.text())
-    .then(html => {
-      const div = document.createElement('div');
-      div.innerHTML = html;
-      wrapper.appendChild(div);
-    });
-}
-</script>
+  <!-- Container mit Blur-Box -->
+  <iframe id="container-frame" src="container.html"></iframe>
 
 </body>
 </html>
