@@ -3,9 +3,18 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Index Seite</title>
+  <title>Index mit Hintergrund</title>
   <style>
-    html, body { margin: 0; padding: 0; width: 100%; height: 100%; overflow-x: hidden; }
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      width: 100%;
+      background: black;
+      font-family: sans-serif;
+      overflow-x: hidden;
+    }
+
     .bg-iframe {
       position: fixed;
       top: 50%;
@@ -13,39 +22,41 @@
       width: 100%;
       height: 100%;
       border: none;
-      transform: translate(-50%, -50%) scale(1.2);
       z-index: 0;
+      transform: translate(-50%, -50%);
     }
-    .container-placeholder {
+
+    .container-wrapper {
       position: relative;
       z-index: 10;
       display: flex;
       flex-direction: column;
-      gap: 2rem;
+      gap: 2rem; /* Abstand zwischen Containern */
+    }
+
+    iframe.container-frame {
+      width: 100%;
+      border: none;
+      height: 35vh; /* gleiche Höhe wie blur-wrapper im Referenz */
+    }
+
+    @media (max-width: 767px) {
+      iframe.container-frame {
+        height: 50vh;
+      }
     }
   </style>
 </head>
 <body>
 
-<iframe class="bg-iframe" src="https://paulkimmerl.github.io/tunnel/"></iframe>
+  <!-- Hintergrund iFrame -->
+  <iframe class="bg-iframe" src="https://paulkimmerl.github.io/tunnel/"></iframe>
 
-<div class="container-placeholder" id="containers">
-  <!-- Hier kommen die Container rein -->
-</div>
-
-<script>
-  async function loadContainer(folder) {
-    const res = await fetch(`${folder}/container.html`);
-    const html = await res.text();
-    const div = document.createElement('div');
-    div.innerHTML = html;
-    document.getElementById('containers').appendChild(div);
-  }
-
-  // Beispiel: Container aus Folder1 und Folder2 laden
-  loadContainer('folder1');
-  loadContainer('folder2');
-</script>
+  <!-- Container einbetten -->
+  <div class="container-wrapper">
+    <iframe class="container-frame" src="folder1/container.html"></iframe>
+    <!-- weitere Container hier -->
+  </div>
 
 </body>
 </html>
