@@ -13,6 +13,7 @@
       font-family: sans-serif;
       color: rgba(255,255,255,0.7);
       font-weight: 300;
+      background: transparent;
     }
 
     .blur-wrapper {
@@ -20,26 +21,26 @@
       display: flex;
       justify-content: center;
       flex-direction: column;
-      margin-bottom: 2rem; /* Abstand zwischen Containern */
+      margin-bottom: 2rem;
     }
 
     .blur-box {
       width: 100%;
-      max-width: 1200px; /* optional max width */
+      max-width: 1200px; /* optional */
       margin: 0 auto;
-      background: rgba(255,255,255,0.12);
+      background: rgba(255, 255, 255, 0.12);
       backdrop-filter: blur(6px);
       -webkit-backdrop-filter: blur(6px);
       display: flex;
       flex-direction: row;
-      height: 40vh;
+      height: 60vh; /* höher als vorher */
       overflow: hidden;
-      cursor: grab; /* zeigt Scrollinteraktion */
+      cursor: grab;
     }
 
     .text-content {
       flex: 1;
-      padding: 1rem;
+      padding: 1.5rem; /* mehr Padding */
       overflow-y: auto;
       white-space: pre-wrap;
       mask-image: linear-gradient(to bottom, black 85%, transparent 100%);
@@ -49,13 +50,13 @@
     .text-content h2 {
       margin: 0 0 0.5rem 0;
       font-weight: 300;
-      font-size: 1.6rem;
+      font-size: 1.8rem;
     }
 
     .text-content p {
       margin: 0;
       line-height: 1.5;
-      font-size: 0.95rem;
+      font-size: 1rem;
     }
 
     .image-content {
@@ -67,7 +68,7 @@
     .image-content img {
       width: 100%;
       height: 100%;
-      object-fit: cover;
+      object-fit: cover;       /* skaliert korrekt und füllt Container */
       object-position: right center;
       display: block;
     }
@@ -77,9 +78,16 @@
         flex-direction: column;
         height: auto;
       }
-      .text-content, .image-content { width: 100%; height: auto; }
-      .image-content img { object-fit: contain; }
-      .text-content h2 { font-size: 1.4rem; }
+      .text-content, .image-content {
+        width: 100%;
+        height: auto;
+      }
+      .image-content img {
+        object-fit: contain;
+      }
+      .text-content h2 {
+        font-size: 1.6rem;
+      }
     }
   </style>
 </head>
@@ -90,7 +98,7 @@
     <div class="blur-box">
       <div class="text-content">
         <h2>Container 1</h2>
-        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Lorem ipsum dolor sit amet.</p>
+        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Lorem ipsum dolor sit amet.</p>
       </div>
       <div class="image-content">
         <img src="image1.png" alt="Bild 1"/>
@@ -102,7 +110,7 @@
     <div class="blur-box">
       <div class="text-content">
         <h2>Container 2</h2>
-        <p>Mehr Text hier für Testzwecke. Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
+        <p>Mehr Text hier für Testzwecke. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Noch mehr Text zum Testen der Scrollfunktion.</p>
       </div>
       <div class="image-content">
         <img src="image2.png" alt="Bild 2"/>
@@ -114,7 +122,7 @@
     <div class="blur-box">
       <div class="text-content">
         <h2>Container 3</h2>
-        <p>Noch mehr Text zum Scrollen und Testen. Lorem ipsum dolor sit amet, consectetur.</p>
+        <p>Noch mehr Text zum Scrollen und Testen. Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
       </div>
       <div class="image-content">
         <img src="image3.png" alt="Bild 3"/>
