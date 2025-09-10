@@ -1,134 +1,59 @@
-<!DOCTYPE html>
-<html lang="de">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Container</title>
-  <style>
-    html, body {
-      margin: 0;
-      padding: 0;
-      width: 100%;
-      box-sizing: border-box;
-      font-family: sans-serif;
-      color: rgba(255,255,255,0.7);
-      font-weight: 300;
-      background: transparent;
-    }
-
-    .blur-wrapper {
-      width: 100%;
-      display: flex;
-      justify-content: center;
-      flex-direction: column;
-      margin-bottom: 2rem;
-    }
-
-    .blur-box {
-      width: 100%;
-      max-width: 1200px; /* optional */
-      margin: 0 auto;
-      background: rgba(255, 255, 255, 0.12);
-      backdrop-filter: blur(6px);
-      -webkit-backdrop-filter: blur(6px);
-      display: flex;
-      flex-direction: row;
-      height: 60vh; /* höher als vorher */
-      overflow: hidden;
-      cursor: grab;
-    }
-
-    .text-content {
-      flex: 1;
-      padding: 1.5rem; /* mehr Padding */
-      overflow-y: auto;
-      white-space: pre-wrap;
-      mask-image: linear-gradient(to bottom, black 85%, transparent 100%);
-      -webkit-mask-image: linear-gradient(to bottom, black 85%, transparent 100%);
-    }
-
-    .text-content h2 {
-      margin: 0 0 0.5rem 0;
-      font-weight: 300;
-      font-size: 1.8rem;
-    }
-
-    .text-content p {
-      margin: 0;
-      line-height: 1.5;
-      font-size: 1rem;
-    }
-
-    .image-content {
-      width: 50%;
-      height: 100%;
-      overflow: hidden;
-    }
-
-    .image-content img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;       /* skaliert korrekt und füllt Container */
-      object-position: right center;
-      display: block;
-    }
-
-    @media (max-width: 767px) {
-      .blur-box {
-        flex-direction: column;
-        height: auto;
-      }
-      .text-content, .image-content {
-        width: 100%;
-        height: auto;
-      }
-      .image-content img {
-        object-fit: contain;
-      }
-      .text-content h2 {
-        font-size: 1.6rem;
-      }
-    }
-  </style>
-</head>
-<body>
-
-  <!-- Mehrere Container zum Testen von Scroll -->
-  <div class="blur-wrapper">
-    <div class="blur-box">
-      <div class="text-content">
-        <h2>Container 1</h2>
-        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Lorem ipsum dolor sit amet.</p>
-      </div>
-      <div class="image-content">
-        <img src="image1.png" alt="Bild 1"/>
-      </div>
+<div class="blur-wrapper">
+  <div class="blur-box">
+    <div class="text-content">
+      <h2>Überschrift</h2>
+      <p>Hier steht dein Text...</p>
+    </div>
+    <div class="image-content">
+      <img src="image.png" alt="Bild">
     </div>
   </div>
+</div>
 
-  <div class="blur-wrapper">
-    <div class="blur-box">
-      <div class="text-content">
-        <h2>Container 2</h2>
-        <p>Mehr Text hier für Testzwecke. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Noch mehr Text zum Testen der Scrollfunktion.</p>
-      </div>
-      <div class="image-content">
-        <img src="image2.png" alt="Bild 2"/>
-      </div>
-    </div>
-  </div>
+<style>
+.blur-wrapper {
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+  width: 100%;
+  height: 80vh; /* höherer Container */
+  padding: 1rem;
+  box-sizing: border-box;
+}
 
-  <div class="blur-wrapper">
-    <div class="blur-box">
-      <div class="text-content">
-        <h2>Container 3</h2>
-        <p>Noch mehr Text zum Scrollen und Testen. Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
-      </div>
-      <div class="image-content">
-        <img src="image3.png" alt="Bild 3"/>
-      </div>
-    </div>
-  </div>
+.blur-box {
+  display: flex;
+  width: 100%;
+  height: 100%;
+  background: rgba(255,255,255,0.12);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  overflow: hidden;
+}
 
-</body>
-</html>
+.text-content {
+  flex: 1;
+  padding: 1rem;
+  overflow-y: auto;
+  color: rgba(255,255,255,0.9);
+  font-weight: 300;
+  white-space: pre-wrap;
+}
+
+.text-content h2 { font-size: 1.6rem; margin-bottom: 0.5rem; }
+.text-content p { font-size: 1rem; line-height: 1.5; }
+
+.image-content {
+  width: 50%;
+  height: 100%;
+  overflow: hidden;
+}
+
+.image-content img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;          /* korrektes Scaling */
+  object-position: right center;
+  display: block;
+}
+</style>
