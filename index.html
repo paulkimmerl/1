@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>ScrollSnap Demo</title>
+<title>Index mit Hintergrund und Container</title>
 <style>
 html, body {
   margin: 0;
@@ -11,7 +11,6 @@ html, body {
   width: 100%;
   height: 100%;
   overflow-x: hidden;
-  scroll-behavior: smooth;
 }
 
 body {
@@ -27,12 +26,12 @@ body {
   transform: translate(-50%, -50%) scale(1.2);
   z-index: 0;
   border: none;
-  pointer-events: auto; /* Interaktion möglich */
+  pointer-events: auto; /* Hintergrund bleibt interaktiv */
 }
 
 .container-wrapper {
   position: relative;
-  z-index: 10; /* über dem Hintergrund */
+  z-index: 10;
 }
 </style>
 </head>
@@ -43,8 +42,7 @@ body {
 <div class="container-wrapper" id="container-wrapper"></div>
 
 <script>
-// Anzahl der Container zum Testen
-const repeat = 3;
+const repeat = 3; // Anzahl der Container zum Testen
 const wrapper = document.getElementById('container-wrapper');
 
 for (let i = 0; i < repeat; i++) {
@@ -54,6 +52,7 @@ for (let i = 0; i < repeat; i++) {
       const div = document.createElement('div');
       div.classList.add('container');
       div.innerHTML = html;
+      div.style.scrollSnapAlign = 'start';
       wrapper.appendChild(div);
     });
 }
