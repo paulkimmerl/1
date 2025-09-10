@@ -1,0 +1,28 @@
+<div class="blur-wrapper" id="blur-wrapper-1">
+  <div class="blur-box" id="blur-box-1">
+    <div class="text-content" id="text-content-1"></div>
+    <div class="image-content">
+      <img src="image.png" alt="Bild" />
+    </div>
+  </div>
+</div>
+
+<script>
+async function loadText(containerId, textId) {
+  try {
+    const res = await fetch('content.txt');
+    const fullText = await res.text();
+    const lines = fullText.split('\n');
+
+    let html = '';
+    if(lines.length > 0) html += `<h2>${lines.shift().trim()}</h2>`;
+    if(lines.length > 0) html += `<p>${lines.join('\n')}</p>`;
+
+    document.getElementById(textId).innerHTML = html;
+  } catch(err) {
+    document.getElementById(textId).innerHTML = '<h2>Fehler</h2><p>' + err.message + '</p>';
+  }
+}
+
+loadText('blur-wrapper-1', 'text-content-1');
+</script>
