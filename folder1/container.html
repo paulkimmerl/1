@@ -12,11 +12,12 @@
 
 <style>
 .blur-wrapper {
+  position: relative;
   display: flex;
   justify-content: center;
   flex-direction: column;
   width: 100%;
-  height: 80vh; /* höherer Container */
+  height: 60vh; /* Container Höhe */
   padding: 1rem;
   box-sizing: border-box;
 }
@@ -52,8 +53,16 @@
 .image-content img {
   width: 100%;
   height: 100%;
-  object-fit: cover;          /* korrektes Scaling */
+  object-fit: cover;           /* korrektes Scaling */
   object-position: right center;
   display: block;
+}
+
+@media (max-width: 767px) {
+  .blur-wrapper { height: 50vh; }
+  .blur-box { flex-direction: column; height: auto; }
+  .text-content, .image-content { width: 100%; height: auto; }
+  .image-content img { object-fit: contain; }
+  .text-content h2 { font-size: 1.4rem; }
 }
 </style>
