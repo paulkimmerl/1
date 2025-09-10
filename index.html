@@ -7,22 +7,21 @@
 <style>
 html, body {
   margin: 0; padding: 0; height: 100%; width: 100%; overflow: hidden; background: black;
-  font-family: sans-serif; color: white;
+  font-family: sans-serif;
 }
 .bg-iframe {
-  position: fixed; top: 50%; left: 50%;
-  width: 100%; height: 100%; border: none; z-index: 0;
-  transform: translate(-50%, -50%) scale(1.3);
+  position: fixed; top: 50%; left: 50%; width: 100%; height: 100%; border: none; z-index: 0;
+  transform: translate(-50%, -50%) scale(1.2);
 }
 .container-wrapper {
   position: relative; z-index: 10;
   display: flex; flex-direction: column; gap: 2rem; padding: 1rem;
 }
 .container-wrapper iframe {
-  width: 100%; height: 50vh; border: none;
+  width: 100%; height: 35vh; border: none; /* Höhe wie im Container definiert */
 }
 @media (max-width: 767px) {
-  .container-wrapper iframe { height: 40vh; }
+  .container-wrapper iframe { height: 50vh; }
 }
 </style>
 </head>
@@ -32,6 +31,8 @@ html, body {
 
 <div class="container-wrapper">
   <iframe src="folder1/container.html"></iframe>
+  <iframe src="folder2/container.html"></iframe>
+  <!-- Weitere Container hier -->
 </div>
 
 </body>
