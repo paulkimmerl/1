@@ -39,19 +39,21 @@
     border: none;
     z-index: 0;
     transform: translate(-50%, -50%);
+    pointer-events: none; /* Hintergrund kann angeklickt werden, wenn Container nicht */
   }
 
   /* Container iFrame */
   .container-frame {
     width: 100%;
-    max-height: 35vh; /* genau wie vorher */
+    max-height: 50vh; /* größer als vorher */
     border: none;
     z-index: 10;
+    pointer-events: auto; /* Interaktion auf Container möglich */
   }
 
   @media (max-width: 767px) {
     .container-frame {
-      max-height: 50vh;
+      max-height: 60vh;
     }
   }
 </style>
@@ -61,7 +63,7 @@
   <!-- Fixer Hintergrund -->
   <iframe class="bg-iframe" src="https://paulkimmerl.github.io/tunnel/"></iframe>
 
-  <!-- Mehrere Container-Sectionen zum Scrollen -->
+  <!-- Mehrere Container-Sectionen -->
   <div class="section"><iframe class="container-frame" src="folder1/container.html"></iframe></div>
   <div class="section"><iframe class="container-frame" src="folder1/container.html"></iframe></div>
   <div class="section"><iframe class="container-frame" src="folder1/container.html"></iframe></div>
