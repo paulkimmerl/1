@@ -3,71 +3,74 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Container</title>
+  <title>Container Blur</title>
   <style>
     html, body {
       margin: 0;
       padding: 0;
       width: 100%;
       height: 100%;
+      background: transparent;
       font-family: sans-serif;
       color: rgba(255,255,255,0.7);
       font-weight: 300;
       overflow: hidden;
-      background: transparent;
     }
 
-    body {
-      display: flex;
-      flex-direction: column;
-      scroll-snap-type: y mandatory;
-      overflow-y: auto;
-    }
-
-    .container {
-      scroll-snap-align: start;
-      min-height: 100vh;
-      width: 100%;
+    .blur-wrapper {
+      position: fixed;
+      left: 0;
+      right: 0;
+      bottom: 0;
       display: flex;
       justify-content: center;
-      align-items: flex-end;
-      padding-bottom: 2rem; /* Abstand unten */
+      flex-direction: column;
+      z-index: 10;
+      max-height: 35vh;
     }
 
     .blur-box {
-      width: 90%;
-      max-width: 1200px;
+      width: 100%;
       background: rgba(255, 255, 255, 0.12);
       backdrop-filter: blur(6px);
       -webkit-backdrop-filter: blur(6px);
       display: flex;
       flex-direction: row;
-      height: 40vh;
-      min-height: 250px;
+      height: 100%;
+      max-height: 100%;
       overflow: hidden;
     }
 
     .text-content {
       flex: 1;
+      text-align: left;
+      overflow-y: scroll;
+      max-height: 100%;
       padding: 1rem;
-      overflow-y: auto;
-      color: rgba(255,255,255,0.9);
-      font-weight: 300;
+      scrollbar-width: none;
+      position: relative;
+      mask-image: linear-gradient(to bottom, black 85%, transparent 100%);
+      -webkit-mask-image: linear-gradient(to bottom, black 85%, transparent 100%);
+      white-space: pre-wrap;
     }
+
+    .text-content::-webkit-scrollbar { display: none; }
 
     .text-content h2 {
       font-size: 1.6rem;
       margin: 0 0 0.5rem 0;
+      font-weight: 300;
     }
 
     .text-content p {
       font-size: 0.95rem;
-      line-height: 1.5;
       margin: 0;
+      line-height: 1.5;
     }
 
     .image-content {
       width: 50%;
+      height: 100%;
       overflow: hidden;
     }
 
@@ -79,11 +82,10 @@
       display: block;
     }
 
-    .text-content::-webkit-scrollbar { display: none; }
-
     @media (max-width: 767px) {
-      .blur-box { flex-direction: column; height: auto; }
-      .text-content, .image-content { width: 100%; height: auto; }
+      .blur-wrapper { max-height: 50vh; }
+      .blur-box { flex-direction: column; height: auto; max-height: 100%; }
+      .text-content, .image-content { width: 100%; height: auto; flex: none; }
       .image-content img { object-fit: contain; }
       .text-content h2 { font-size: 1.4rem; }
     }
@@ -91,43 +93,42 @@
 </head>
 <body>
 
-  <!-- Beispiel mehrerer Container für Scroll-Snap -->
-  <div class="container">
-    <div class="blur-box">
-      <div class="text-content" id="text-content-1"></div>
+  <div class="blur-wrapper" id="blur-wrapper">
+    <div class="blur-box" id="blur-box">
+      <div class="text-content" id="text-content"></div>
       <div class="image-content">
-        <img src="image1.png" alt="Bild 1" />
-      </div>
-    </div>
-  </div>
-
-  <div class="container">
-    <div class="blur-box">
-      <div class="text-content" id="text-content-2"></div>
-      <div class="image-content">
-        <img src="image2.png" alt="Bild 2" />
+        <img src="image.png" alt="Bild" />
       </div>
     </div>
   </div>
 
   <script>
-    async function loadText(id, file) {
-      const elem = document.getElementById(id);
+    function fitTextToImage() {
+      const text = document.getElementById('text-content');
+      const img = document.querySelector('.image-content img');
+      if (img.complete) text.style.maxHeight = img.clientHeight + 'px';
+      else img.onload = () => text.style.maxHeight = img.clientHeight + 'px';
+    }
+
+    async function loadText() {
       try {
-        const res = await fetch(file);
-        const text = await res.text();
-        const lines = text.split('\n');
+        const res = await fetch('content.txt');
+        const fullText = await res.text();
+        const lines = fullText.split('\n');
+
         let html = '';
-        if (lines.length > 0) html += `<h2>${lines.shift().trim()}</h2>`;
-        if (lines.length > 0) html += `<p>${lines.join('\n')}</p>`;
-        elem.innerHTML = html;
+        if(lines.length > 0) html += `<h2>${lines.shift().trim()}</h2>`;
+        if(lines.length > 0) html += `<p>${lines.join('\n')}</p>`;
+
+        document.getElementById('text-content').innerHTML = html;
+        fitTextToImage();
       } catch(err) {
-        elem.innerHTML = '<h2>Fehler</h2><p>' + err.message + '</p>';
+        document.getElementById('text-content').innerHTML = '<h2>Fehler</h2><p>' + err.message + '</p>';
       }
     }
 
-    loadText('text-content-1','content1.txt');
-    loadText('text-content-2','content2.txt');
+    loadText();
+    window.addEventListener('resize', fitTextToImage);
   </script>
 
 </body>
