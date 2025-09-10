@@ -27,8 +27,8 @@
 
     .blur-wrapper {
       position: fixed;
-      left: 1cm;
-      right: 1cm;
+      left: 0;       /* entfernt die schwarzen Ränder */
+      right: 0;      /* entfernt die schwarzen Ränder */
       bottom: 0;
       max-height: 70vh; /* max Höhe insgesamt */
       display: flex;
@@ -57,15 +57,13 @@
       text-align: left;
       white-space: pre-wrap;
       overflow-y: auto;
-      height: 100%;
-      max-height: 100%;
+      max-height: 100%; /* wird auf Höhe des Containers begrenzt */
       padding-right: 0.5rem;
 
       scrollbar-width: thin;
       scrollbar-color: rgba(255,255,255,0.2) transparent;
 
       position: relative;
-      /* smooth transparent fade oben und unten */
       mask-image: linear-gradient(to bottom, transparent, black 10%, black 90%, transparent);
       -webkit-mask-image: linear-gradient(to bottom, transparent, black 10%, black 90%, transparent);
     }
@@ -80,13 +78,11 @@
     }
 
     .image-content img {
-      height: 100%;    /* Bild gleiche Höhe wie Text */
+      height: 100%;    /* Bild gleiche Höhe wie Container */
       width: auto;
       object-fit: cover;
       border-radius: 0;
       max-width: 100%;
-
-      /* gewünschte transform aus deinem Beispiel */
       transform: scale(1) translateY(0);
       transition: transform 0.3s ease;
     }
@@ -99,7 +95,7 @@
       bottom: 0;
     }
 
-    /* Mobile Layout: Bild unter Text, Bildbreite = Textbreite */
+    /* Mobile Layout: Bild unter Text */
     @media (max-width: 767px) {
       .blur-box {
         flex-direction: column;
@@ -115,11 +111,9 @@
       }
 
       .image-content img {
-        width: 100%;   /* Bild volle Breite */
-        height: auto;  /* proportional */
+        width: 100%;
+        height: auto;
         object-fit: contain;
-
-        /* transform beibehalten */
         transform: scale(1) translateY(0);
       }
     }
@@ -150,18 +144,31 @@
       lineAbove.style.bottom = (windowHeight - rect.top) + 'px';
     }
 
+    function fitTextToImage() {
+      const text = document.getElementById('text-content');
+      const img = document.querySelector('.image-content img');
+      if (img.complete) {
+        text.style.maxHeight = img.clientHeight + 'px';
+      } else {
+        img.onload = () => {
+          text.style.maxHeight = img.clientHeight + 'px';
+        }
+      }
+    }
+
     fetch('content.txt')
       .then(res => res.text())
       .then(text => {
         document.getElementById('text-content').innerText = text;
+        fitTextToImage();
         updateLineAbove();
       })
       .catch(err => {
         document.getElementById('text-content').innerText = 'Fehler beim Laden: ' + err.message;
       });
 
-    window.addEventListener('load', updateLineAbove);
-    window.addEventListener('resize', updateLineAbove);
+    window.addEventListener('load', () => { fitTextToImage(); updateLineAbove(); });
+    window.addEventListener('resize', () => { fitTextToImage(); updateLineAbove(); });
   </script>
 
 </body>
