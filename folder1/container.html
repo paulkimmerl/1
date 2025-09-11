@@ -1,112 +1,56 @@
-/* Grundlayout */
-html, body {
-  margin: 0;
-  padding: 0;
-  height: 100%;
-  width: 100%;
-  background: black;
-  font-family: Arial, Helvetica, sans-serif;
-  color: rgba(255, 255, 255, 0.7);
-  font-weight: 300;
-  box-sizing: border-box;
-  overflow: hidden;
-}
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Blur mit Text & Bild</title>
+  <link rel="stylesheet" href="container.css" />
+</head>
+<body>
 
-/* Hintergrund-Iframe */
-.bg-iframe {
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  width: 100%;
-  height: 100%;
-  border: none;
-  z-index: 0;
-  opacity: 0;
-  transform: translate(-50%, -60%) scale(1.2);
-  transform-origin: center center;
-  transition: opacity 0.5s ease, transform 0.5s ease;
-}
+  <!-- Hintergrund-Video/iframe -->
+  <iframe id="bg-frame" class="bg-iframe" src="https://paulkimmerl.github.io/tunnel/"></iframe>
 
-.bg-iframe.visible {
-  opacity: 1;
-}
+  <!-- Blur-Container -->
+  <div class="blur-wrapper">
+    <div class="blur-box">
+      <div class="text-content" id="text-content"></div>
+      <div class="image-content">
+        <img src="image.png" alt="Bild" />
+      </div>
+    </div>
+  </div>
 
-/* Blur-Wrapper */
-.blur-wrapper {
-  position: fixed;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  display: flex;
-  justify-content: center;
-  flex-direction: column;
-  z-index: 10;
-  max-height: 35vh;
-}
+  <script>
+    async function loadText() {
+      try {
+        const res = await fetch('./content.txt');
+        const fullText = await res.text();
+        const lines = fullText.split('\n');
 
-/* Blur-Box */
-.blur-box {
-  width: 100%;
-  background: rgba(255, 255, 255, 0.12);
-  backdrop-filter: blur(6px);
-  -webkit-backdrop-filter: blur(6px);
-  display: flex;
-  flex-direction: row;
-  height: 100%;
-  max-height: 100%;
-  overflow: hidden;
-}
+        let html = '';
+        if(lines.length > 0) html += `<h2>${lines.shift().trim()}</h2>`;
+        if(lines.length > 0) html += `<p>${lines.join('\n')}</p>`;
 
-/* Text-Container */
-.text-content {
-  flex: 1;
-  text-align: left;
-  overflow-y: scroll;
-  max-height: 100%;
-  padding: 1rem;
-  scrollbar-width: none;
-  white-space: pre-wrap;
-  color: rgba(255, 255, 255, 0.9);
-}
+        document.getElementById('text-content').innerHTML = html;
+        fitTextToImage();
 
-.text-content::-webkit-scrollbar { display: none; }
+        document.getElementById('bg-frame').classList.add('visible');
+      } catch(err) {
+        document.getElementById('text-content').innerHTML = `<h2>Fehler</h2><p>${err.message}</p>`;
+        document.getElementById('bg-frame').classList.add('visible');
+      }
+    }
 
-/* Überschrift H2 */
-.text-content h2 {
-  font-size: 1.6rem;
-  font-weight: 700;       /* kräftig */
-  color: #ffffff;         /* sichtbar */
-  margin: 0 0 0.5rem 0;
-}
+    function fitTextToImage() {
+      const text = document.getElementById('text-content');
+      const img = document.querySelector('.image-content img');
+      if(img.complete) text.style.maxHeight = img.clientHeight + 'px';
+      else img.onload = () => text.style.maxHeight = img.clientHeight + 'px';
+    }
 
-/* Paragraph */
-.text-content p {
-  font-size: 0.95rem;
-  margin: 0;
-  line-height: 1.5;
-  color: rgba(255, 255, 255, 0.7);
-}
-
-/* Bild-Container */
-.image-content {
-  width: 50%;
-  height: 100%;
-  overflow: hidden;
-}
-
-.image-content img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  object-position: right center;
-  display: block;
-}
-
-/* Responsive */
-@media (max-width: 767px) {
-  .blur-wrapper { max-height: 50vh; }
-  .blur-box { flex-direction: column; height: auto; max-height: 100%; }
-  .text-content, .image-content { width: 100%; height: auto; flex: none; }
-  .image-content img { width: 100%; height: auto; object-fit: contain; }
-  .text-content h2 { font-size: 1.4rem; }
-}
+    loadText();
+    window.addEventListener('resize', fitTextToImage);
+  </script>
+</body>
+</html>
