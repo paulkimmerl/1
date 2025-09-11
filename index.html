@@ -4,27 +4,34 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Blur mit Text & Bild</title>
-  <link rel="stylesheet" href="container.css" />
+  <!-- Pfad angepasst: container.css liegt in folder1 -->
+  <link rel="stylesheet" href="folder1/container.css" />
 </head>
 <body>
 
-  <!-- Hintergrund-Video/iframe -->
   <iframe id="bg-frame" class="bg-iframe" src="https://paulkimmerl.github.io/tunnel/"></iframe>
 
-  <!-- Blur-Container -->
   <div class="blur-wrapper">
     <div class="blur-box">
       <div class="text-content" id="text-content"></div>
       <div class="image-content">
-        <img src="image.png" alt="Bild" />
+        <img src="folder1/image.png" alt="Bild" />
       </div>
     </div>
   </div>
 
   <script>
+    function fitTextToImage() {
+      const text = document.getElementById('text-content');
+      const img = document.querySelector('.image-content img');
+      if (img.complete) text.style.maxHeight = img.clientHeight + 'px';
+      else img.onload = () => text.style.maxHeight = img.clientHeight + 'px';
+    }
+
     async function loadText() {
       try {
-        const res = await fetch('./content.txt');
+        // Pfad angepasst: content.txt liegt im selben Ordner wie index.html
+        const res = await fetch('content.txt');
         const fullText = await res.text();
         const lines = fullText.split('\n');
 
@@ -34,7 +41,6 @@
 
         document.getElementById('text-content').innerHTML = html;
         fitTextToImage();
-
         document.getElementById('bg-frame').classList.add('visible');
       } catch(err) {
         document.getElementById('text-content').innerHTML = `<h2>Fehler</h2><p>${err.message}</p>`;
@@ -42,15 +48,9 @@
       }
     }
 
-    function fitTextToImage() {
-      const text = document.getElementById('text-content');
-      const img = document.querySelector('.image-content img');
-      if(img.complete) text.style.maxHeight = img.clientHeight + 'px';
-      else img.onload = () => text.style.maxHeight = img.clientHeight + 'px';
-    }
-
     loadText();
     window.addEventListener('resize', fitTextToImage);
   </script>
+
 </body>
 </html>
