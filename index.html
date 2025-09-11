@@ -7,10 +7,13 @@
   <link rel="stylesheet" href="container.css" />
 </head>
 <body>
+
+  <!-- Hintergrund-Iframe -->
   <iframe id="bg-frame" class="bg-iframe" src="https://paulkimmerl.github.io/tunnel/"></iframe>
 
-  <div class="blur-wrapper" id="blur-wrapper">
-    <div class="blur-box" id="blur-box">
+  <!-- Blur-Container -->
+  <div class="blur-wrapper">
+    <div class="blur-box">
       <div class="text-content" id="text-content"></div>
       <div class="image-content">
         <img src="image.png" alt="Bild" />
@@ -19,29 +22,32 @@
   </div>
 
   <script>
+    // Text aus content.txt laden
     async function loadText() {
       try {
-        const res = await fetch('content.txt');
+        const res = await fetch('./content.txt');
         const fullText = await res.text();
         const lines = fullText.split('\n');
 
         let html = '';
-        if (lines.length > 0) html += `<h2>${lines.shift().trim()}</h2>`;
-        if (lines.length > 0) html += `<p>${lines.join('\n')}</p>`;
+        if(lines.length > 0) html += `<h2>${lines.shift().trim()}</h2>`; // erste Zeile als H2
+        if(lines.length > 0) html += `<p>${lines.join('\n')}</p>`;        // Rest als P
 
         document.getElementById('text-content').innerHTML = html;
         fitTextToImage();
+
         document.getElementById('bg-frame').classList.add('visible');
-      } catch (err) {
-        document.getElementById('text-content').innerHTML = '<h2>Fehler</h2><p>' + err.message + '</p>';
+      } catch(err) {
+        document.getElementById('text-content').innerHTML = `<h2>Fehler</h2><p>${err.message}</p>`;
         document.getElementById('bg-frame').classList.add('visible');
       }
     }
 
+    // Texthöhe an Bildhöhe anpassen
     function fitTextToImage() {
       const text = document.getElementById('text-content');
       const img = document.querySelector('.image-content img');
-      if (img.complete) text.style.maxHeight = img.clientHeight + 'px';
+      if(img.complete) text.style.maxHeight = img.clientHeight + 'px';
       else img.onload = () => text.style.maxHeight = img.clientHeight + 'px';
     }
 
