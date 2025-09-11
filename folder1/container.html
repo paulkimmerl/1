@@ -5,7 +5,7 @@ html, body {
   width: 100%;
   background: black;
   font-family: sans-serif;
-  color: rgba(255,255,255,0.7);
+  color: rgba(255, 255, 255, 0.7);
   font-weight: 300;
   box-sizing: border-box;
   overflow: hidden;
@@ -25,7 +25,9 @@ html, body {
   transition: opacity 0.5s ease, transform 0.5s ease;
 }
 
-.bg-iframe.visible { opacity: 1; }
+.bg-iframe.visible {
+  opacity: 1;
+}
 
 .blur-wrapper {
   position: fixed;
@@ -43,6 +45,7 @@ html, body {
   width: 100%;
   background: rgba(255, 255, 255, 0.12);
   backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
   display: flex;
   flex-direction: row;
   height: 100%;
@@ -57,31 +60,38 @@ html, body {
   max-height: 100%;
   padding: 1rem;
   scrollbar-width: none;
+  position: relative;
+  mask-image: linear-gradient(to bottom, black 85%, transparent 100%);
+  -webkit-mask-image: linear-gradient(to bottom, black 85%, transparent 100%);
   white-space: pre-wrap;
-  color: rgba(255,255,255,0.7);
+  color: rgba(255, 255, 255, 0.9);
   font-weight: 300;
 }
 
-.text-content::-webkit-scrollbar { display: none; }
+.text-content::-webkit-scrollbar {
+  display: none;
+}
 
 .text-content h2 {
   font-size: 1.6rem;
+  margin: 0 0 0.5rem 0;
   font-weight: 600;
   color: #ffffff;
-  margin: 0 0 0.5rem 0;
 }
 
 .text-content p {
   font-size: 0.95rem;
   margin: 0;
   line-height: 1.5;
-  color: rgba(255,255,255,0.7);
+  color: rgba(255, 255, 255, 0.7);
 }
 
 .image-content {
   width: 50%;
   height: 100%;
   overflow: hidden;
+  margin: 0;
+  padding: 0;
 }
 
 .image-content img {
@@ -93,9 +103,27 @@ html, body {
 }
 
 @media (max-width: 767px) {
-  .blur-wrapper { max-height: 50vh; }
-  .blur-box { flex-direction: column; height: auto; max-height: 100%; }
-  .text-content, .image-content { width: 100%; height: auto; flex: none; }
-  .image-content img { width: 100%; height: auto; object-fit: contain; }
-  .text-content h2 { font-size: 1.4rem; }
+  .blur-wrapper {
+    max-height: 50vh;
+  }
+  .blur-box {
+    flex-direction: column;
+    height: auto;
+    max-height: 100%;
+  }
+  .text-content,
+  .image-content {
+    width: 100%;
+    height: auto;
+    max-height: 100%;
+    flex: none;
+  }
+  .image-content img {
+    width: 100%;
+    height: auto;
+    object-fit: contain;
+  }
+  .text-content h2 {
+    font-size: 1.4rem;
+  }
 }
