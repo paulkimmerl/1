@@ -4,23 +4,40 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Blur mit Text & Bild</title>
-  <!-- Pfad angepasst: container.css liegt in folder1 -->
-  <link rel="stylesheet" href="folder1/container.css" />
+  <link rel="stylesheet" href="container.css" />
 </head>
 <body>
-
   <iframe id="bg-frame" class="bg-iframe" src="https://paulkimmerl.github.io/tunnel/"></iframe>
 
-  <div class="blur-wrapper">
-    <div class="blur-box">
+  <div class="blur-wrapper" id="blur-wrapper">
+    <div class="blur-box" id="blur-box">
       <div class="text-content" id="text-content"></div>
       <div class="image-content">
-        <img src="folder1/image.png" alt="Bild" />
+        <img src="image.png" alt="Bild" />
       </div>
     </div>
   </div>
 
   <script>
+    async function loadText() {
+      try {
+        const res = await fetch('content.txt');
+        const fullText = await res.text();
+        const lines = fullText.split('\n');
+
+        let html = '';
+        if (lines.length > 0) html += `<h2>${lines.shift().trim()}</h2>`;
+        if (lines.length > 0) html += `<p>${lines.join('\n')}</p>`;
+
+        document.getElementById('text-content').innerHTML = html;
+        fitTextToImage();
+        document.getElementById('bg-frame').classList.add('visible');
+      } catch (err) {
+        document.getElementById('text-content').innerHTML = '<h2>Fehler</h2><p>' + err.message + '</p>';
+        document.getElementById('bg-frame').classList.add('visible');
+      }
+    }
+
     function fitTextToImage() {
       const text = document.getElementById('text-content');
       const img = document.querySelector('.image-content img');
@@ -28,29 +45,8 @@
       else img.onload = () => text.style.maxHeight = img.clientHeight + 'px';
     }
 
-    async function loadText() {
-      try {
-        // Pfad angepasst: content.txt liegt im selben Ordner wie index.html
-        const res = await fetch('content.txt');
-        const fullText = await res.text();
-        const lines = fullText.split('\n');
-
-        let html = '';
-        if(lines.length > 0) html += `<h2>${lines.shift().trim()}</h2>`;
-        if(lines.length > 0) html += `<p>${lines.join('\n')}</p>`;
-
-        document.getElementById('text-content').innerHTML = html;
-        fitTextToImage();
-        document.getElementById('bg-frame').classList.add('visible');
-      } catch(err) {
-        document.getElementById('text-content').innerHTML = `<h2>Fehler</h2><p>${err.message}</p>`;
-        document.getElementById('bg-frame').classList.add('visible');
-      }
-    }
-
     loadText();
     window.addEventListener('resize', fitTextToImage);
   </script>
-
 </body>
 </html>
