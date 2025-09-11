@@ -8,7 +8,7 @@
 </head>
 <body>
 
-  <!-- Hintergrund-Iframe -->
+  <!-- Hintergrund-Video/iframe -->
   <iframe id="bg-frame" class="bg-iframe" src="https://paulkimmerl.github.io/tunnel/"></iframe>
 
   <!-- Blur-Container -->
@@ -22,7 +22,6 @@
   </div>
 
   <script>
-    // Text aus content.txt laden
     async function loadText() {
       try {
         const res = await fetch('./content.txt');
@@ -30,8 +29,8 @@
         const lines = fullText.split('\n');
 
         let html = '';
-        if(lines.length > 0) html += `<h2>${lines.shift().trim()}</h2>`; // erste Zeile als H2
-        if(lines.length > 0) html += `<p>${lines.join('\n')}</p>`;        // Rest als P
+        if(lines.length > 0) html += `<h2>${lines.shift().trim()}</h2>`;
+        if(lines.length > 0) html += `<p>${lines.join('\n')}</p>`;
 
         document.getElementById('text-content').innerHTML = html;
         fitTextToImage();
@@ -43,7 +42,6 @@
       }
     }
 
-    // Texthöhe an Bildhöhe anpassen
     function fitTextToImage() {
       const text = document.getElementById('text-content');
       const img = document.querySelector('.image-content img');
