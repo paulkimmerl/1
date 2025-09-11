@@ -1,52 +1,299 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Blur mit Text & Bild</title>
-  <link rel="stylesheet" href="container.css" />
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Fullpage TB/T/B/F/TBb</title>
+<style>
+html,body{
+    margin:0;
+    padding:0;
+    width:100vw;
+    height:100vh;
+    font-family:sans-serif;
+    font-weight:300;
+    color:rgba(255,255,255,0.7);
+    box-sizing:border-box;
+    overflow-x:hidden;
+    scroll-snap-type:y mandatory;
+    scroll-behavior:smooth;
+    background:black;
+}
+body{overflow-y:auto;}
+#bg-frame{
+    position:fixed;
+    top:0;
+    left:0;
+    width:100vw;
+    height:100vh;
+    border:none;
+    z-index:0;
+    pointer-events:auto;
+}
+.container-wrapper{
+    display:flex;
+    flex-direction:column;
+    width:100vw;
+    position:relative;
+    z-index:1;
+}
+.blur-wrapper{
+    height:100vh;
+    width:100vw;
+    display:flex;
+    align-items:flex-end;
+    scroll-snap-align:start;
+    position:relative;
+    overflow:hidden;
+    pointer-events:none;
+}
+.blur-box{
+    pointer-events:auto;
+    box-sizing:border-box;
+    width:100vw;
+}
+.blur-box.bottom{
+    max-height:35vh;
+    background:rgba(255,255,255,0.12);
+    backdrop-filter:blur(6px);
+    -webkit-backdrop-filter:blur(6px);
+    display:flex;
+    flex-direction:row;
+    overflow:hidden;
+    margin:0;
+    padding:0;
+}
+.blur-box.fullscreen{
+    height:100%;
+    background:rgba(255,255,255,0.12);
+    backdrop-filter:blur(6px);
+    -webkit-backdrop-filter:blur(6px);
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    flex-direction:column;
+    position:relative;
+    overflow:hidden;
+}
+.blur-box.fullscreen-image{
+    height:100%;
+    display:flex;
+    flex-direction:column;
+    justify-content:flex-start;
+    align-items:center;
+    overflow:hidden;
+    position:relative;
+}
+.fullscreen-media{
+    flex:1;
+    width:100vw;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    overflow:hidden;
+}
+.fullscreen-media img,.fullscreen-media iframe{
+    width:100%;
+    height:100%;
+    object-fit:cover;
+    border:none;
+    display:block;
+}
+.blur-bottom-text{
+    width:100vw;
+    background:rgba(255,255,255,0.12);
+    backdrop-filter:blur(6px);
+    -webkit-backdrop-filter:blur(6px);
+    padding:1rem;
+    box-sizing:border-box;
+    text-align:left;
+}
+.text-content{
+    padding:1rem;
+    white-space:pre-wrap;
+    color:rgba(255,255,255,0.7);
+    font-weight:300;
+    font-size:0.95rem;
+    scrollbar-width:none;
+    max-width:50vw;
+    overflow-y:auto;
+}
+.text-content::-webkit-scrollbar{display:none;}
+.text-content h2{font-size:1.6rem;margin:0 0 0.5rem 0;font-weight:300;}
+.text-content p{font-size:0.85rem;margin:0;line-height:1.4;}
+.image-content{
+    width:50vw;
+    height:100%;
+    overflow:hidden;
+    flex-shrink:0;
+    margin:0;
+}
+.image-content img{
+    width:100%;
+    height:100%;
+    object-fit:cover;
+    object-position:center;
+    display:block;
+}
+.blur-box.TBb{
+    height:100%;
+    display:flex;
+    flex-direction:column;
+    justify-content:flex-start;
+    align-items:center;
+    overflow:hidden;
+    position:relative;
+}
+.TBb-fullscreen{
+    flex:1;
+    width:100vw;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    overflow:hidden;
+}
+.TBb-fullscreen img{
+    width:100%;
+    height:100%;
+    object-fit:cover;
+}
+.TBb-bottom{
+    max-height:35vh;
+    background:rgba(255,255,255,0.12);
+    backdrop-filter:blur(6px);
+    -webkit-backdrop-filter:blur(6px);
+    display:flex;
+    flex-direction:row;
+    overflow:hidden;
+}
+.B-grid{
+    width:100vw;
+    height:100%;
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    grid-auto-rows:calc(100%/3);
+    margin:0;
+    padding:0;
+    gap:0;
+}
+.B-grid img{
+    width:100%;
+    height:100%;
+    object-fit:cover;
+    display:block;
+}
+@media(max-width:767px){
+    .blur-box.bottom{flex-direction:column;max-height:50vh;}
+    .text-content,.image-content{width:100%;height:auto;flex:none;}
+    .image-content img{width:100%;height:auto;object-fit:contain;}
+    .text-content h2{font-size:1.4rem;}
+    .text-content p{font-size:0.8rem;}
+    .B-grid{grid-template-columns:1fr;grid-auto-rows:auto;}
+}
+</style>
 </head>
 <body>
-  <iframe id="bg-frame" class="bg-iframe" src="https://paulkimmerl.github.io/tunnel/"></iframe>
-
-  <div class="blur-wrapper" id="blur-wrapper">
-    <div class="blur-box" id="blur-box">
-      <div class="text-content" id="text-content"></div>
-      <div class="image-content">
-        <img src="image.png" alt="Bild" />
-      </div>
-    </div>
-  </div>
-
-  <script>
-    async function loadText() {
-      try {
+<iframe id="bg-frame" src="https://paulkimmerl.github.io/tunnel/" allow="autoplay; fullscreen"></iframe>
+<div class="container-wrapper" id="container-wrapper"></div>
+<script>
+async function loadContent(){
+    try{
         const res = await fetch('content.txt');
-        const fullText = await res.text();
-        const lines = fullText.split('\n');
+        const contentInput = await res.text();
+        const containerWrapper = document.getElementById('container-wrapper');
+        const containerRegex = /#\d+(TB|T|B|F|TBb)?/g;
+        let matches,lastIndex=0,prevType;
+        while((matches=containerRegex.exec(contentInput))!==null){
+            const type = matches[1] || 'TB';
+            const startIndex = matches.index;
+            if(lastIndex!==0){
+                const text = contentInput.slice(lastIndex,startIndex).trim();
+                if(text) createContainer(prevType,text);
+            }
+            prevType = type;
+            lastIndex = containerRegex.lastIndex;
+        }
+        const lastText = contentInput.slice(lastIndex).trim();
+        if(lastText) createContainer(prevType,lastText);
+    }catch(e){console.error('Fehler beim Laden von content.txt:',e);}
+}
 
-        let html = '';
-        if (lines.length > 0) html += `<h2>${lines.shift().trim()}</h2>`;
-        if (lines.length > 0) html += `<p>${lines.join('\n')}</p>`;
+function extractMedia(text){
+    const imgMatches = [...text.matchAll(/\/\/\s*(.+\.(png|jpg|jpeg|gif|webp))/gi)].map(m=>m[1]);
+    const embedMatch = text.match(/&&\s*(.+)/i);
+    return {imgs:imgMatches, embed:embedMatch?embedMatch[1]:null};
+}
 
-        document.getElementById('text-content').innerHTML = html;
-        fitTextToImage();
-        document.getElementById('bg-frame').classList.add('visible');
-      } catch (err) {
-        document.getElementById('text-content').innerHTML = '<h2>Fehler</h2><p>' + err.message + '</p>';
-        document.getElementById('bg-frame').classList.add('visible');
-      }
+function createContainer(type,text){
+    const wrapper = document.createElement('div');
+    wrapper.className = 'blur-wrapper';
+    let box;
+    if(type==='TB'){box = document.createElement('div'); box.className='blur-box bottom';}
+    else if(type==='T'||type==='B'){box = document.createElement('div'); box.className='blur-box fullscreen';}
+    else if(type==='F'){box = document.createElement('div'); box.className='blur-box fullscreen-image';}
+    else if(type==='TBb'){box = document.createElement('div'); box.className='blur-box TBb';}
+
+    const textDiv = document.createElement('div');
+    textDiv.className = 'text-content';
+    const formattedText = text.replace(/\*(.*?)\*/g,'<h2>$1</h2>');
+    textDiv.innerHTML = formattedText.replace(/\n/g,'<br>');
+
+    const media = extractMedia(text);
+
+    if(type==='TB'){
+        if(media.imgs.length){
+            const imgDiv = document.createElement('div'); imgDiv.className='image-content';
+            const img = document.createElement('img'); img.src = media.imgs[0]; imgDiv.appendChild(img);
+            box.appendChild(textDiv); box.appendChild(imgDiv);
+        } else { box.appendChild(textDiv); }
+    } else if(type==='TBb'){
+        const topDiv = document.createElement('div'); topDiv.className='TBb-fullscreen';
+        if(media.imgs[0]){ const img = document.createElement('img'); img.src=media.imgs[0]; topDiv.appendChild(img); }
+        box.appendChild(topDiv);
+        const bottomDiv = document.createElement('div'); bottomDiv.className='TBb-bottom';
+        const bottomText = document.createElement('div'); bottomText.className='text-content';
+        bottomText.innerHTML = formattedText.replace(/\n/g,'<br>');
+        bottomDiv.appendChild(bottomText);
+        if(media.imgs[1]){
+            const imgDiv = document.createElement('div'); imgDiv.className='image-content';
+            const img = document.createElement('img'); img.src=media.imgs[1]; imgDiv.appendChild(img);
+            bottomDiv.appendChild(imgDiv);
+        }
+        box.appendChild(bottomDiv);
+    } else if(type==='B'){
+        if(media.imgs.length){
+            const gridDiv = document.createElement('div'); gridDiv.className='B-grid';
+            media.imgs.forEach(src=>{ const img = document.createElement('img'); img.src=src; gridDiv.appendChild(img); });
+            box.appendChild(gridDiv);
+        } else if(media.embed){
+            const embedWrapper = document.createElement('div'); embedWrapper.style.width='100%'; embedWrapper.style.height='100%';
+            let src = media.embed;
+            if(src.includes("youtube.com/watch")){ src=src.replace("watch?v=","embed/")+"?autoplay=1&loop=1&playlist="+src.split("v=")[1]+"&mute=1"; }
+            embedWrapper.innerHTML=`<iframe src="${src}" frameborder="0" allow="autoplay; fullscreen" allowfullscreen></iframe>`;
+            box.appendChild(embedWrapper);
+        }
+    } else if(type==='T'){
+        textDiv.style.position='absolute'; textDiv.style.left='0'; textDiv.style.bottom='0';
+        box.appendChild(textDiv);
+    } else if(type==='F'){
+        const mediaDiv = document.createElement('div'); mediaDiv.className='fullscreen-media';
+        if(media.imgs[0]){ const img = document.createElement('img'); img.src=media.imgs[0]; mediaDiv.appendChild(img); }
+        else if(media.embed){ 
+            let src=media.embed; 
+            if(src.includes("youtube.com/watch")){ src=src.replace("watch?v=","embed/")+"?autoplay=1&loop=1&playlist="+src.split("v=")[1]+"&mute=1"; }
+            const iframe = document.createElement('iframe'); iframe.src=src; iframe.allow="autoplay; fullscreen"; mediaDiv.appendChild(iframe);
+        }
+        box.appendChild(mediaDiv);
+        const bottomText = document.createElement('div'); bottomText.className='blur-bottom-text';
+        bottomText.innerHTML = textDiv.innerHTML;
+        box.appendChild(bottomText);
     }
 
-    function fitTextToImage() {
-      const text = document.getElementById('text-content');
-      const img = document.querySelector('.image-content img');
-      if (img.complete) text.style.maxHeight = img.clientHeight + 'px';
-      else img.onload = () => text.style.maxHeight = img.clientHeight + 'px';
-    }
+    wrapper.appendChild(box);
+    document.getElementById('container-wrapper').appendChild(wrapper);
+}
 
-    loadText();
-    window.addEventListener('resize', fitTextToImage);
-  </script>
+loadContent();
+</script>
 </body>
 </html>
