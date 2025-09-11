@@ -1,16 +1,18 @@
+/* Grundlayout */
 html, body {
   margin: 0;
   padding: 0;
   height: 100%;
   width: 100%;
   background: black;
-  font-family: sans-serif;
+  font-family: Arial, Helvetica, sans-serif;
   color: rgba(255, 255, 255, 0.7);
   font-weight: 300;
   box-sizing: border-box;
   overflow: hidden;
 }
 
+/* Hintergrund-Iframe */
 .bg-iframe {
   position: fixed;
   top: 50%;
@@ -29,6 +31,7 @@ html, body {
   opacity: 1;
 }
 
+/* Blur-Wrapper */
 .blur-wrapper {
   position: fixed;
   left: 0;
@@ -41,6 +44,7 @@ html, body {
   max-height: 35vh;
 }
 
+/* Blur-Box */
 .blur-box {
   width: 100%;
   background: rgba(255, 255, 255, 0.12);
@@ -53,6 +57,7 @@ html, body {
   overflow: hidden;
 }
 
+/* Text-Container */
 .text-content {
   flex: 1;
   text-align: left;
@@ -60,25 +65,21 @@ html, body {
   max-height: 100%;
   padding: 1rem;
   scrollbar-width: none;
-  position: relative;
-  mask-image: linear-gradient(to bottom, black 85%, transparent 100%);
-  -webkit-mask-image: linear-gradient(to bottom, black 85%, transparent 100%);
   white-space: pre-wrap;
   color: rgba(255, 255, 255, 0.9);
-  font-weight: 300;
 }
 
-.text-content::-webkit-scrollbar {
-  display: none;
-}
+.text-content::-webkit-scrollbar { display: none; }
 
+/* Überschrift H2 */
 .text-content h2 {
   font-size: 1.6rem;
+  font-weight: 700;       /* kräftig */
+  color: #ffffff;         /* sichtbar */
   margin: 0 0 0.5rem 0;
-  font-weight: 600;
-  color: #ffffff;
 }
 
+/* Paragraph */
 .text-content p {
   font-size: 0.95rem;
   margin: 0;
@@ -86,12 +87,11 @@ html, body {
   color: rgba(255, 255, 255, 0.7);
 }
 
+/* Bild-Container */
 .image-content {
   width: 50%;
   height: 100%;
   overflow: hidden;
-  margin: 0;
-  padding: 0;
 }
 
 .image-content img {
@@ -102,28 +102,11 @@ html, body {
   display: block;
 }
 
+/* Responsive */
 @media (max-width: 767px) {
-  .blur-wrapper {
-    max-height: 50vh;
-  }
-  .blur-box {
-    flex-direction: column;
-    height: auto;
-    max-height: 100%;
-  }
-  .text-content,
-  .image-content {
-    width: 100%;
-    height: auto;
-    max-height: 100%;
-    flex: none;
-  }
-  .image-content img {
-    width: 100%;
-    height: auto;
-    object-fit: contain;
-  }
-  .text-content h2 {
-    font-size: 1.4rem;
-  }
+  .blur-wrapper { max-height: 50vh; }
+  .blur-box { flex-direction: column; height: auto; max-height: 100%; }
+  .text-content, .image-content { width: 100%; height: auto; flex: none; }
+  .image-content img { width: 100%; height: auto; object-fit: contain; }
+  .text-content h2 { font-size: 1.4rem; }
 }
