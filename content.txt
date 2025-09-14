@@ -1,7 +1,8 @@
-#1TB
-//image.png
-*Motion Design System*
+>>https://paulkimmerl.github.io/frakta/
 
+
+#1TBL
+*Motion Design System*
 In the "Hidden Layers" project, our team developed a cohesive motion design system 
 for the 2024 Design & AI Conference. 
 We reinterpreted the institution’s corporate identity to create a flexible design framework, 
@@ -18,17 +19,19 @@ Programms
     Adobe After Effects
     vvvv Gamma#
 
+//image.png
+<<https://paulkimmerl.github.io/tunnel/
+
+
 #2B
 //led1.png
-//led1.png
-//led1.png
-//led1.png
-//led1.png
+//sss.jpeg
+
+&&https://www.youtube.com/watch?v=_btdUa4QPPs
 
 
 
-
-#3TBb
+#3TBL
 //sss.jpeg
 *Umkrempler 2k-6*
 Umkrempler 2k-6 is an audio-visual performance by Lio Vast and Paul Kimmerl.
@@ -45,8 +48,11 @@ sfdgdfgsdgfhydgh
 dafürdgdfg
 dgdfgdfgdfg
 
+
+>>https://paulkimmerl.github.io/tunnel/
+
 #5TB
-//Legacy-Windows Medienwiedergabe 01.04.2025 08_10_44.png
+&&https://www.youtube.com/watch?v=_btdUa4QPPs
 
 hdfbsbfhjbshvbs asuhf fushg hfd ghj gj dfgdfg dafürgdfghd
 h d
@@ -69,7 +75,8 @@ hjhgjhgjhgjgjhgjhgjhjhgyx kugbhjkygkgh kjgh kjhkjhy kughk yghkghk jykhj kjyjgh k
 hyjb jhvy jh gyjhg jhygf +yjyk yg hdfbsbfhjbshvbsyy jhgjx
 hg jxfjxhgjdg kdgkghdk 
 
-#7TBb
+#7TBL
+//Legacy-Windows Medienwiedergabe 01.04.2025 08_10_44.png
 
-sdfsdfsdfsfs
-
+kjfigjfkfjn
+jbnfjfdbjggjgdbn
